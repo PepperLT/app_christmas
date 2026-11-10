@@ -5,6 +5,7 @@ class AppRoutes {
   static const countdown = '/countdown';
   static const music = '/music';
   static const settings = '/settings';
+  static const adventCalendar = '/advent-calendar';
 }
 
 const christmasMenuRoutes = <ChristmasMenuItem, String>{
@@ -12,4 +13,5 @@ const christmasMenuRoutes = <ChristmasMenuItem, String>{
   ChristmasMenuItem.countdown: AppRoutes.countdown,
   ChristmasMenuItem.music: AppRoutes.music,
   ChristmasMenuItem.settings: AppRoutes.settings,
+  ChristmasMenuItem.adventCalendar: AppRoutes.adventCalendar,
 };

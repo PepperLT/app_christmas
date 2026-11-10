@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../core/theme/app_theme.dart';
+import '../features/advent_calendar/presentation/page/advent_calendar_page.dart';
 import '../features/countdown/presentation/bindings/countdown_binding.dart';
 import '../features/countdown/presentation/pages/countdown_page.dart';
 import '../features/music/presentation/page/music_page.dart';
@@ -21,6 +22,7 @@ class ChristmasApp extends StatelessWidget {
       theme: appTheme,
       initialRoute: AppRoutes.welcome,
       getPages: [
+        AdventCalendarPage.route,
         GetPage(name: AppRoutes.welcome, page: () => const WelcomePage()),
         GetPage(
           name: AppRoutes.music,
