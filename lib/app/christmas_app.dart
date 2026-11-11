@@ -1,3 +1,4 @@
+import 'package:christmas_countdown/features/bubblle_box/presentation/page/bubble_box_page.dart';
 import 'package:christmas_countdown/features/settings/presentation/page/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import '../features/countdown/presentation/pages/countdown_page.dart';
 import '../features/music/presentation/page/music_page.dart';
 import '../features/settings/presentation/bindings/settings_binding.dart';
 import '../features/welcome/presentation/pages/welcome_page.dart';
+import '../features/bubblle_box/presentation/bindings/bubble_box_binding.dart';
 import 'app_routes.dart';
 
 class ChristmasApp extends StatelessWidget {
@@ -37,6 +39,11 @@ class ChristmasApp extends StatelessWidget {
           name: AppRoutes.settings,
           page: () => const SettingsPage(),
           binding: SettingsBinding(),
+        ),
+        GetPage(
+          name: AppRoutes.bubbleBox,
+          page: () => const BubbleBoxPage(),
+          binding: BubbleBoxBinding(),
         ),
       ],
     );

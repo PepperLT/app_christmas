@@ -1,3 +1,4 @@
+import '../../../../core/widget/shareable_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,7 @@ class SettingsPage extends GetView<SettingsController> {
   Widget build(BuildContext context) {
     const accent = Color(0xFFB4232B);
 
-    return Scaffold(
+    return ShareableScaffold(
       drawer: const ChristmasDrawer(
         activeItem: ChristmasMenuItem.settings,
         routes: christmasMenuRoutes,

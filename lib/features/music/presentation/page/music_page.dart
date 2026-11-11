@@ -1,3 +1,4 @@
+import '../../../../core/widget/shareable_scaffold.dart';
 import 'package:christmas_countdown/core/widget/app_menu_button.dart';
 import 'package:christmas_countdown/core/widget/christmas_drawer.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class MusicPage extends GetView<MusicPlayerService> {
     const accentColor = Color(0xFFB4232B);
     const selectedColor = Color(0xFF4D992C);
 
-    return Scaffold(
+    return ShareableScaffold(
       backgroundColor: backgroundColor,
       drawer: ChristmasDrawer(
         activeItem: ChristmasMenuItem.music,

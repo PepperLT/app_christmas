@@ -1,3 +1,4 @@
+import '../../../../core/widget/shareable_scaffold.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -101,7 +102,7 @@ class _AdventCalendarPageState extends State<AdventCalendarPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ShareableScaffold(
       drawer: const ChristmasDrawer(
         activeItem: ChristmasMenuItem.adventCalendar,
         routes: christmasMenuRoutes,
