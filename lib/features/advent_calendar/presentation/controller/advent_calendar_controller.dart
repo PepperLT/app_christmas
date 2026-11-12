@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../data/advent_progress_service.dart';
 import '../../data/local_advent_days.dart';
+import '../../../../core/services/sound_effects_service.dart';
 
 class AdventCalendarController extends GetxController {
   AdventCalendarController({
@@ -100,6 +101,7 @@ class AdventCalendarController extends GetxController {
         refreshProgress();
       }
 
+      SoundEffectsService.emit(SoundEffect.reward);
       return true;
     } catch (_) {
       errorMessage.value = 'Không thể lưu tiến độ. Hãy thử lại.';

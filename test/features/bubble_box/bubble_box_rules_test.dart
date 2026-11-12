@@ -1,13 +1,11 @@
-// ignore_for_file: depend_on_referenced_packages
 import 'dart:math';
-// Tests stay inside this feature to keep the requested change scope.
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import '../domain/bubble_box_board.dart';
-import '../domain/entity/bubble_item.dart';
-import '../presentation/controller/bubble_box_controller.dart';
-import '../presentation/page/bubble_box_page.dart';
+import 'package:christmas_countdown/features/bubblle_box/domain/bubble_box_board.dart';
+import 'package:christmas_countdown/features/bubblle_box/domain/entity/bubble_item.dart';
+import 'package:christmas_countdown/features/bubblle_box/presentation/controller/bubble_box_controller.dart';
+import 'package:christmas_countdown/features/bubblle_box/presentation/page/bubble_box_page.dart';
 
 List<int>? pair(List<BubbleItem?> cells) {
   for (var i = 0; i < cells.length; i++) {

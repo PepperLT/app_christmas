@@ -304,7 +304,7 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                       const SizedBox(height: 4),
                       Image.asset(
                         'assets/images/footer.png',
-                        height: 42,
+                        height: 80,
                         fit: BoxFit.fitWidth,
                         excludeFromSemantics: true,
                       ),

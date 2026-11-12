@@ -9,6 +9,8 @@ class AdventCalendarBinding extends Bindings {
     Get.lazyPut<AdventCalendarController>(
       () => AdventCalendarController(
         progressService: Get.find<AdventProgressService>(),
+        // test 1 ô quà ngày đầu tiên
+        // now: () => DateTime(2026, 12, 1, 12),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../domain/bubble_box_board.dart';
 import '../../domain/entity/bubble_item.dart';
+import '../../../../core/services/sound_effects_service.dart';
 
 class BubbleBoxController extends GetxController {
   BubbleBoxController({BubbleBoxBoard? board})
@@ -25,6 +26,7 @@ class BubbleBoxController extends GetxController {
   void rescueBoard() {
     if (rescuesRemaining.value <= 0 || !_board.rescue()) return;
     rescuesRemaining.value--;
+    SoundEffectsService.emit(SoundEffect.rescue);
     selectedIndex.value = null;
     _syncBoard();
   }
@@ -53,6 +55,7 @@ class BubbleBoxController extends GetxController {
     if (upgradedItem == null) return;
 
     score.value += upgradedItem.level * 10;
+    SoundEffectsService.emit(SoundEffect.merge);
     _syncBoard();
   }
 

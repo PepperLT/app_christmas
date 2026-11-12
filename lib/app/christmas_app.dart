@@ -12,6 +12,11 @@ import '../features/settings/presentation/bindings/settings_binding.dart';
 import '../features/welcome/presentation/pages/welcome_page.dart';
 import '../features/bubblle_box/presentation/bindings/bubble_box_binding.dart';
 import 'app_routes.dart';
+import '../core/services/snowfall_service.dart';
+import '../core/widget/snowfall_overlay.dart';
+import '../features/about/presentation/page/about_page.dart';
+import '../features/wallpapers/presentation/page/wallpapers_page.dart';
+import '../features/wallpapers/presentation/bindings/wallpapers_binding.dart';
 
 class ChristmasApp extends StatelessWidget {
   const ChristmasApp({super.key});
@@ -22,8 +27,33 @@ class ChristmasApp extends StatelessWidget {
       title: 'Christmas Countdown',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
+      builder: (context, child) {
+        if (!Get.isRegistered<SnowfallService>()) {
+          return child ?? const SizedBox.shrink();
+        }
+        final snowfall = Get.find<SnowfallService>();
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            child ?? const SizedBox.shrink(),
+            Obx(
+              () =>
+                  snowfall.enabled.value &&
+                      !MediaQuery.disableAnimationsOf(context)
+                  ? const SnowfallOverlay()
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        );
+      },
       initialRoute: AppRoutes.welcome,
       getPages: [
+        GetPage(name: AppRoutes.about, page: () => const AboutPage()),
+        GetPage(
+          name: AppRoutes.wallpapers,
+          page: () => const WallpapersPage(),
+          binding: WallpapersBinding(),
+        ),
         AdventCalendarPage.route,
         GetPage(name: AppRoutes.welcome, page: () => const WelcomePage()),
         GetPage(

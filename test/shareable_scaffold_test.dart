@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:christmas_countdown/core/services/screenshot_share_service.dart';
@@ -13,16 +14,24 @@ void main() {
       share: (params) async {
         calls++;
         expect(
+          find.byType(ChristmasDrawer),
+          findsNothing,
+          reason:
+              'Capture must wait for drawer animation and scrim to disappear',
+        );
+        expect(
           tester.state<ScaffoldState>(find.byType(Scaffold)).isDrawerOpen,
           isFalse,
         );
         expect(params.files, hasLength(1));
-        expect((await params.files!.single.readAsBytes()).take(4), [
-          137,
-          80,
-          78,
-          71,
-        ]);
+        final bytes = await params.files!.single.readAsBytes();
+        final codec = await ui.instantiateImageCodec(bytes);
+        final frame = await codec.getNextFrame();
+        expect(frame.image.width, 1600);
+        expect(frame.image.height, 1200);
+        frame.image.dispose();
+        codec.dispose();
+        expect(bytes.take(4), [137, 80, 78, 71]);
       },
     );
     await tester.pumpWidget(
@@ -35,12 +44,16 @@ void main() {
           ),
           appBar: AppBar(title: const Text('Page')),
           body: const Center(child: Text('Content to share')),
+          bottomNavigationBar: const SizedBox(
+            height: 50,
+            child: Text('Footer'),
+          ),
         ),
       ),
     );
     final capture = find
         .ancestor(
-          of: find.text('Content to share'),
+          of: find.byType(Scaffold),
           matching: find.byType(RepaintBoundary),
         )
         .evaluate()
@@ -57,12 +70,19 @@ void main() {
         of: find.byWidget(capture.widget),
         matching: find.byType(AppBar),
       ),
-      findsNothing,
+      findsOneWidget,
     );
     expect(
       find.descendant(
         of: find.byWidget(capture.widget),
         matching: find.text('Content to share'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byWidget(capture.widget),
+        matching: find.text('Footer'),
       ),
       findsOneWidget,
     );

@@ -10,7 +10,6 @@ enum ChristmasMenuItem {
   premium('Premium', Icons.workspace_premium_outlined),
   wallpapers('Wallpapers', Icons.image_outlined),
   settings('Settings', Icons.settings_outlined),
-  help('Help', Icons.help_outline),
   about('About', Icons.info_outline),
   share('Share', Icons.share_outlined);
 
@@ -69,7 +68,14 @@ class ChristmasDrawer extends StatelessWidget {
                   CircleAvatar(
                     radius: 28,
                     backgroundColor: Color(0xFFFFD6C6),
-                    child: Text('🎅', style: TextStyle(fontSize: 34)),
+                    child: Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Image(
+                        image: AssetImage('assets/images/jingle_bells.png'),
+                        fit: BoxFit.contain,
+                        excludeFromSemantics: true,
+                      ),
+                    ),
                   ),
                   SizedBox(width: 10),
                   Expanded(

@@ -31,6 +31,7 @@ class ShareableScaffold extends StatefulWidget {
 
 class _ShareableScaffoldState extends State<ShareableScaffold> {
   final _captureKey = GlobalKey();
+  final _drawerKey = GlobalKey();
   bool _pending = false;
   bool _sharing = false;
 
@@ -43,7 +44,16 @@ class _ShareableScaffoldState extends State<ShareableScaffold> {
     _pending = false;
     _sharing = true;
     try {
-      await WidgetsBinding.instance.endOfFrame;
+      // The callback reports the start of closing. Flutter unmounts the drawer
+      // content only once its closing animation has actually been dismissed.
+      final timeout = Stopwatch()..start();
+      do {
+        await WidgetsBinding.instance.endOfFrame;
+        if (!mounted) return;
+        if (timeout.elapsed > const Duration(seconds: 5)) {
+          throw StateError('Drawer did not finish closing');
+        }
+      } while (_drawerKey.currentContext != null);
       if (!mounted) return;
       final boundary = _captureKey.currentContext?.findRenderObject();
       if (boundary is! RenderRepaintBoundary || !boundary.attached) {
@@ -66,24 +76,21 @@ class _ShareableScaffoldState extends State<ShareableScaffold> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: widget.appBar,
-    body: RepaintBoundary(
-      key: _captureKey,
-      child: ColoredBox(
-        color:
-            widget.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
-        child: SizedBox.expand(child: widget.body),
+  Widget build(BuildContext context) => RepaintBoundary(
+    key: _captureKey,
+    child: Scaffold(
+      appBar: widget.appBar,
+      body: widget.body,
+      backgroundColor: widget.backgroundColor,
+      drawerScrimColor: widget.drawerScrimColor,
+      bottomNavigationBar: widget.bottomNavigationBar,
+      onDrawerChanged: _drawerChanged,
+      drawer: ChristmasDrawer(
+        key: _drawerKey,
+        activeItem: widget.drawer.activeItem,
+        routes: widget.drawer.routes,
+        onShare: _requestShare,
       ),
-    ),
-    backgroundColor: widget.backgroundColor,
-    drawerScrimColor: widget.drawerScrimColor,
-    bottomNavigationBar: widget.bottomNavigationBar,
-    onDrawerChanged: _drawerChanged,
-    drawer: ChristmasDrawer(
-      activeItem: widget.drawer.activeItem,
-      routes: widget.drawer.routes,
-      onShare: _requestShare,
     ),
   );
 }

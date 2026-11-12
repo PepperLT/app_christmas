@@ -23,12 +23,10 @@ class SettingsPage extends GetView<SettingsController> {
       bottomNavigationBar: SizedBox(
         height: MediaQuery.sizeOf(context).height * 0.3,
         width: double.infinity,
-        child: ClipRect(
-          child: Image.asset(
-            'assets/images/footer_0.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.bottomCenter,
-          ),
+        child: Image.asset(
+          'assets/images/footer_0.png',
+          fit: BoxFit.contain,
+          alignment: Alignment.bottomCenter,
         ),
       ),
       appBar: AppBar(
@@ -61,34 +59,28 @@ class SettingsPage extends GetView<SettingsController> {
                       onChanged: controller.setPlayMusic,
                     ),
                   ),
-                  for (final (icon, label, enabled) in const [
-                    (Icons.volume_up_outlined, 'Sound Effects', true),
-                    (Icons.ac_unit, 'Snowfall Effect', true),
-                    (Icons.notifications_outlined, 'Notifications', false),
-                  ])
-                    SwitchListTile(
-                      secondary: Icon(icon, color: accent),
-                      title: Text(label),
-                      value: enabled,
-                      onChanged: null,
+                  Obx(
+                    () => SwitchListTile(
+                      secondary: const Icon(Icons.ac_unit, color: accent),
+                      title: const Text('Snowfall Effect'),
+                      value: controller.snowfall.enabled.value,
+                      onChanged: controller.snowfall.saving.value
+                          ? null
+                          : controller.setSnowfall,
                     ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.language, color: accent),
-                    title: Text('Language'),
-                    trailing: Text('English  ›'),
                   ),
-                  Divider(height: 1),
-                  ListTile(
-                    leading: Icon(Icons.light_mode_outlined, color: accent),
-                    title: Text('Theme'),
-                    trailing: Text('Light  ›'),
+                  Obx(
+                    () => SwitchListTile(
+                      secondary: const Icon(
+                        Icons.volume_up_outlined,
+                        color: accent,
+                      ),
+                      title: const Text('Sound Effects'),
+                      value: controller.soundEffects.enabled.value,
+                      onChanged: controller.soundEffects.saving.value
+                          ? null
+                          : controller.setSoundEffects,
+                    ),
                   ),
                 ],
               ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/countdown_controller.dart';
+import '../../../wallpapers/data/wallpaper_service.dart';
 
 class CountdownPage extends GetView<CountdownController> {
   const CountdownPage({super.key});
@@ -32,17 +33,30 @@ class CountdownPage extends GetView<CountdownController> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    'assets/images/countdown.png',
-                    fit: BoxFit.cover,
-                    alignment: Alignment.bottomCenter,
-                  ),
+                  Get.isRegistered<WallpaperService>()
+                      ? Obx(
+                          () => Image.asset(
+                            Get.find<WallpaperService>().selectedAsset.value,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.bottomCenter,
+                            errorBuilder: (_, error, stack) => Image.asset(
+                              WallpaperService.defaultAsset,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.bottomCenter,
+                            ),
+                          ),
+                        )
+                      : Image.asset(
+                          WallpaperService.defaultAsset,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.bottomCenter,
+                        ),
                   SafeArea(
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
                         const Padding(
-                          padding: EdgeInsets.fromLTRB(16, 32, 16, 16),
+                          padding: EdgeInsets.fromLTRB(16, 75, 16, 16),
                           child: Align(
                             alignment: Alignment.topCenter,
                             child: Text(
@@ -58,7 +72,8 @@ class CountdownPage extends GetView<CountdownController> {
                             ),
                           ),
                         ),
-                        Center(
+                        Align(
+                          alignment: Alignment(0, -0.1),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: ConstrainedBox(
