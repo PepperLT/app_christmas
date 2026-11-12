@@ -6,6 +6,7 @@ import '../../../../core/widget/christmas_drawer.dart';
 import '../../../../core/widget/shareable_scaffold.dart';
 import '../../data/wallpaper_service.dart';
 import '../controllers/wallpapers_controller.dart';
+import '../../../premium/presentation/widgets/premium_dialog.dart';
 
 class WallpapersPage extends GetView<WallpapersController> {
   const WallpapersPage({super.key});
@@ -89,6 +90,10 @@ class WallpapersPage extends GetView<WallpapersController> {
                         onPressed: controller.saving.value
                             ? null
                             : () async {
+                                if (!controller.service.canUse(asset)) {
+                                  await showPremiumDialog(dialogContext);
+                                  return;
+                                }
                                 final applied = await controller.apply(asset);
                                 if (!dialogContext.mounted || !applied) return;
                                 Navigator.pop(dialogContext);
@@ -206,6 +211,16 @@ class WallpapersPage extends GetView<WallpapersController> {
                                   Icons.check_circle,
                                   color: Color(0xFFB4232B),
                                   size: 20,
+                                ),
+                              if (WallpaperService.isPremium(asset) &&
+                                  !controller.service.canUse(asset))
+                                const Tooltip(
+                                  message: 'Premium',
+                                  child: Icon(
+                                    Icons.lock_rounded,
+                                    color: Color(0xFF996319),
+                                    size: 20,
+                                  ),
                                 ),
                             ],
                           ),

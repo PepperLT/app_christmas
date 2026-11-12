@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart';
 
 import 'local_songs.dart';
 import '../domain/entities/song.dart';
+import '../../premium/data/premium_service.dart';
 
 class MusicPlayerService extends GetxService {
   MusicPlayerService({AudioPlayer? player}) : _player = player ?? AudioPlayer();
@@ -26,9 +27,11 @@ class MusicPlayerService extends GetxService {
   Stream<Duration?> get durationStream => _player.durationStream;
   Duration get position => _player.position;
   Duration? get duration => _player.duration;
+  bool canAccess(Song song) => !song.isPremium || PremiumService.isUnlocked;
 
   void seekSong(Song song, Duration position) {
     if (_closed ||
+        !canAccess(song) ||
         (isBusy.value && !isSeeking.value) ||
         !playMusic.value ||
         loadedSongId.value != song.id ||
@@ -46,10 +49,22 @@ class MusicPlayerService extends GetxService {
   bool _closed = false;
   StreamSubscription<PlayerException>? _errors;
   StreamSubscription<PlayerState>? _states;
+  StreamSubscription<bool>? _premiumChanges;
 
   @override
   void onInit() {
     super.onInit();
+    if (Get.isRegistered<PremiumService>()) {
+      _premiumChanges = Get.find<PremiumService>().accessChanges.listen((_) {
+        final selected = localSongs.where(
+          (song) => song.id == selectedSongId.value,
+        );
+        if (!_closed && selected.isNotEmpty && !canAccess(selected.first)) {
+          selectedSongId.value = null;
+          _requestPlayback();
+        }
+      });
+    }
     _errors = _player.errorStream.listen((exception) {
       if (!_closed && playMusic.value && selectedSongId.value != null) {
         error.value = 'Không thể phát nhạc. Vui lòng thử lại.';
@@ -68,7 +83,7 @@ class MusicPlayerService extends GetxService {
   }
 
   void toggleSong(Song song) {
-    if (_closed) return;
+    if (_closed || !canAccess(song)) return;
     selectedSongId.value = selectedSongId.value == song.id ? null : song.id;
     _pauseRequested = false;
     _requestPlayback();
@@ -83,7 +98,7 @@ class MusicPlayerService extends GetxService {
 
   // Returns false when the app-wide music switch is off.
   bool playSong(Song song) {
-    if (_closed || !playMusic.value) return false;
+    if (_closed || !playMusic.value || !canAccess(song)) return false;
     if (isBusy.value) return true;
     final resume = loadedSongId.value == song.id && error.value == null;
     selectedSongId.value = song.id;
@@ -138,6 +153,7 @@ class MusicPlayerService extends GetxService {
           if (!playMusic.value || songId == null) continue;
 
           final song = localSongs.firstWhere((song) => song.id == songId);
+          if (!canAccess(song)) continue;
           loadingSongId.value = song.id;
           await _player.setAsset(song.audioPath);
           if (_closed || revision != _revision) continue;
@@ -177,6 +193,7 @@ class MusicPlayerService extends GetxService {
     _revision++;
     unawaited(_errors?.cancel());
     unawaited(_states?.cancel());
+    unawaited(_premiumChanges?.cancel());
     unawaited(_player.dispose());
     super.onClose();
   }

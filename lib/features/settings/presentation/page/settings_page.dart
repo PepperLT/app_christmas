@@ -24,7 +24,7 @@ class SettingsPage extends GetView<SettingsController> {
         height: MediaQuery.sizeOf(context).height * 0.3,
         width: double.infinity,
         child: Image.asset(
-          'assets/images/footer_0.png',
+          'assets/images/footer.png',
           fit: BoxFit.contain,
           alignment: Alignment.bottomCenter,
         ),

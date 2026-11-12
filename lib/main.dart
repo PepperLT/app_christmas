@@ -7,10 +7,12 @@ import 'app/christmas_app.dart';
 import 'core/services/snowfall_service.dart';
 import 'core/services/sound_effects_service.dart';
 import 'features/wallpapers/data/wallpaper_service.dart';
+import 'features/premium/data/premium_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final preferences = await SharedPreferences.getInstance();
+  Get.put(PremiumService(), permanent: true);
   Get.put(WallpaperService(preferences: preferences), permanent: true);
   Get.put(SnowfallService(preferences: preferences), permanent: true);
   Get.put(SoundEffectsService(preferences: preferences), permanent: true);

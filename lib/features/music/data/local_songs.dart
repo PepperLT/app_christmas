@@ -25,4 +25,18 @@ const localSongs = [
     imagePath: 'assets/images/we_wish_you.png',
     audioPath: 'assets/audio/we_wish_you.mp3',
   ),
+  Song(
+    id: 'what_child_is_this',
+    title: 'What Child Is This',
+    imagePath: 'assets/images/what_child_is_this.png',
+    audioPath: 'assets/audio/premium/what_child_is_this.mp3',
+    isPremium: true,
+  ),
+  Song(
+    id: 'bethlehem',
+    title: 'Bethlehem',
+    imagePath: 'assets/images/bethlehem.png',
+    audioPath: 'assets/audio/premium/Bethlehem.mp3',
+    isPremium: true,
+  ),
 ];

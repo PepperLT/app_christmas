@@ -8,6 +8,7 @@ import '../../data/local_songs.dart';
 import '../../data/music_player_service.dart';
 import '../bindings/song_detail_binding.dart';
 import 'song_detail_page.dart';
+import '../../../premium/presentation/widgets/premium_dialog.dart';
 
 class MusicPage extends GetView<MusicPlayerService> {
   const MusicPage({super.key, required this.menuRoutes});
@@ -90,7 +91,9 @@ class MusicPage extends GetView<MusicPlayerService> {
                   child: ListTile(
                     minTileHeight: 112,
                     horizontalTitleGap: 16,
-                    tileColor: const Color(0xFFFFF6F3),
+                    tileColor: song.isPremium
+                        ? const Color(0xFFFFFCFA)
+                        : const Color(0xFFFFF6F3),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: const BorderSide(color: Color(0xFFF3B5AC)),
@@ -99,16 +102,18 @@ class MusicPage extends GetView<MusicPlayerService> {
                       horizontal: 12,
                       vertical: 12,
                     ),
-                    onTap: () => Get.to(
-                      () => SongDetailPage(song: song),
-                      binding: SongDetailBinding(song),
-                    ),
+                    onTap: () => !controller.canAccess(song)
+                        ? showPremiumDialog(context)
+                        : Get.to(
+                            () => SongDetailPage(song: song),
+                            binding: SongDetailBinding(song),
+                          ),
                     title: Row(
                       children: [
                         Container(
-                          width: 70,
-                          height: 90,
-                          padding: const EdgeInsets.all(4),
+                          width: song.isPremium ? 80 : 70,
+                          height: song.isPremium ? 80 : 90,
+                          padding: EdgeInsets.all(song.isPremium ? 0 : 4),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF6AAA0),
                             borderRadius: BorderRadius.circular(12),
@@ -133,15 +138,59 @@ class MusicPage extends GetView<MusicPlayerService> {
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Text(
-                            song.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 19,
-                              color: Color(0xFF70343B),
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                song.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 19,
+                                  color: song.isPremium
+                                      ? const Color(0xFF24202A)
+                                      : const Color(0xFF70343B),
+                                  fontWeight: song.isPremium
+                                      ? FontWeight.w800
+                                      : FontWeight.w600,
+                                ),
+                              ),
+                              if (song.isPremium &&
+                                  !controller.canAccess(song)) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFEBCF),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '👑',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      SizedBox(width: 5),
+                                      Flexible(
+                                        child: Text(
+                                          'Premium',
+                                          style: TextStyle(
+                                            color: Color(0xFF873C28),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                       ],
@@ -151,13 +200,24 @@ class MusicPage extends GetView<MusicPlayerService> {
                       tooltip: selectedSongId == song.id
                           ? 'Bỏ chọn ${song.title}'
                           : 'Chọn ${song.title}',
-                      icon: selectedSongId == song.id
+                      icon: !controller.canAccess(song)
+                          ? const Icon(
+                              Icons.lock_outline_rounded,
+                              color: Color(0xFFC32932),
+                            )
+                          : selectedSongId == song.id
                           ? const Icon(Icons.check_circle, color: selectedColor)
                           : const Icon(
                               Icons.radio_button_unchecked,
                               color: Colors.grey,
                             ),
-                      onPressed: () => controller.toggleSong(song),
+                      onPressed: () {
+                        if (!controller.canAccess(song)) {
+                          showPremiumDialog(context);
+                          return;
+                        }
+                        controller.toggleSong(song);
+                      },
                     ),
                   ),
                 ),

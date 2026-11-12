@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../controllers/song_detail_controller.dart';
 import '../widgets/song_progress.dart';
 import '../../domain/entities/song.dart';
+import '../../../premium/data/premium_service.dart';
+import '../../../premium/presentation/widgets/premium_dialog.dart';
 
 class SongDetailPage extends GetView<SongDetailController> {
   const SongDetailPage({super.key, required this.song});
@@ -106,6 +108,11 @@ class SongDetailPage extends GetView<SongDetailController> {
                           onPressed: busy
                               ? null
                               : () {
+                                  if (song.isPremium &&
+                                      !PremiumService.isUnlocked) {
+                                    showPremiumDialog(context);
+                                    return;
+                                  }
                                   if (!controller.togglePlayback()) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

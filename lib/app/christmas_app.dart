@@ -15,6 +15,7 @@ import 'app_routes.dart';
 import '../core/services/snowfall_service.dart';
 import '../core/widget/snowfall_overlay.dart';
 import '../features/about/presentation/page/about_page.dart';
+import '../features/premium/presentation/page/premium_page.dart';
 import '../features/wallpapers/presentation/page/wallpapers_page.dart';
 import '../features/wallpapers/presentation/bindings/wallpapers_binding.dart';
 
@@ -48,6 +49,7 @@ class ChristmasApp extends StatelessWidget {
       },
       initialRoute: AppRoutes.welcome,
       getPages: [
+        GetPage(name: AppRoutes.premium, page: () => const PremiumPage()),
         GetPage(name: AppRoutes.about, page: () => const AboutPage()),
         GetPage(
           name: AppRoutes.wallpapers,
