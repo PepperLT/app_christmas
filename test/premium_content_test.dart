@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:christmas_countdown/features/music/data/local_songs.dart';
-import 'package:christmas_countdown/features/music/data/music_player_service.dart';
+import 'fixtures/local_songs.dart';
+import 'package:christmas_countdown/features/music/music_dependencies.dart';
 import 'package:christmas_countdown/features/wallpapers/data/wallpaper_service.dart';
 import 'package:christmas_countdown/features/premium/data/premium_service.dart';
 import 'music_player_service_test.dart' show FakePlayer, flush;
@@ -16,7 +16,8 @@ void main() {
   });
   test('Premium music cannot select or play without access', () async {
     final player = FakePlayer();
-    final music = MusicPlayerService(player: player)..onInit();
+    final music = MusicPlayerService(player: player, initialSongs: localSongs)
+      ..onInit();
     final premium = localSongs.firstWhere((s) => s.isPremium);
     music.setPlayMusic(true);
     music.toggleSong(premium);

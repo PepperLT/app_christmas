@@ -1,4 +1,4 @@
-import '../domain/entities/song.dart';
+import 'package:christmas_countdown/features/music/domain/entities/song.dart';
 
 const localSongs = [
   Song(

@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import 'package:christmas_countdown/features/music/data/local_songs.dart';
-import 'package:christmas_countdown/features/music/data/music_player_service.dart';
+import 'fixtures/local_songs.dart';
+import 'package:christmas_countdown/features/music/music_dependencies.dart';
+import 'package:christmas_countdown/features/music/domain/entities/song.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -89,11 +90,162 @@ class FakePlayer implements AudioPlayer {
 Future<void> flush() => Future<void>.delayed(Duration.zero);
 
 void main() {
+  test('Switching music off during retry prevents playback restart', () async {
+    Completer<List<Song>>? refresh;
+    final player = FakePlayer();
+    final service = MusicPlayerService(
+      player: player,
+      fetchSongs: () async {
+        return refresh == null ? localSongs : await refresh!.future;
+      },
+    )..onInit();
+    addTearDown(service.onClose);
+    await service.loadSongs();
+    service.toggleSong(localSongs.first);
+    service.setPlayMusic(true);
+    await flush();
+    refresh = Completer<List<Song>>();
+    final retry = service.retry();
+    service.setPlayMusic(false);
+    refresh.complete(localSongs);
+    await retry;
+    await flush();
+    expect(player.playing, isFalse);
+    expect(service.playMusic.value, isFalse);
+  });
+
+  test(
+    'Retry fetches corrected source and detail can retry without restart',
+    () async {
+      var path = 'assets/audio/broken.mp3';
+      var fetches = 0;
+      Song current() => Song(
+        id: 'updated',
+        title: 'Updated',
+        imagePath: 'image.png',
+        audioPath: path,
+      );
+      final player = FakePlayer();
+      final service = MusicPlayerService(
+        player: player,
+        fetchSongs: () async {
+          fetches++;
+          return [current()];
+        },
+      )..onInit();
+      addTearDown(service.onClose);
+      await service.loadSongs();
+      final oldSong = service.songs.single;
+      player.failLoad = true;
+      service.toggleSong(oldSong);
+      service.setPlayMusic(true);
+      await flush();
+      expect(service.error.value, isNotNull);
+      path = 'assets/audio/fixed.mp3';
+      player.failLoad = false;
+      service.playSong(oldSong);
+      await flush();
+      expect(fetches, 2);
+      expect(player.asset, path);
+      expect(player.playing, isTrue);
+      expect(service.error.value, isNull);
+    },
+  );
+
+  test(
+    'Retry does not replay stale source when catalog reload fails',
+    () async {
+      var fail = false;
+      final player = FakePlayer();
+      final service = MusicPlayerService(
+        player: player,
+        fetchSongs: () async {
+          if (fail) throw StateError('Offline');
+          return localSongs;
+        },
+      )..onInit();
+      addTearDown(service.onClose);
+      await service.loadSongs();
+      service.toggleSong(localSongs.first);
+      service.setPlayMusic(true);
+      await flush();
+      final loads = player.loads;
+      fail = true;
+      await service.retry();
+      expect(service.songsError.value, isNotNull);
+      expect(player.loads, loads);
+      expect(service.songs, isNotEmpty);
+    },
+  );
+
+  test(
+    'Fetched catalog drives playback for an ID outside localSongs',
+    () async {
+      final pending = Completer<List<Song>>();
+      final player = FakePlayer();
+      final service = MusicPlayerService(
+        player: player,
+        fetchSongs: () => pending.future,
+      )..onInit();
+      addTearDown(service.onClose);
+      expect(service.isLoadingSongs.value, isTrue);
+      const song = Song(
+        id: 'firestore_song',
+        title: 'Firestore song',
+        imagePath: 'assets/images/jingle_bells.png',
+        audioPath: 'assets/audio/jingle_bells.mp3',
+      );
+      pending.complete([song]);
+      await flush();
+      expect(service.songs, [song]);
+      expect(service.isLoadingSongs.value, isFalse);
+      service.toggleSong(song);
+      service.setPlayMusic(true);
+      await flush();
+      expect(player.asset, song.audioPath);
+      expect(player.playing, isTrue);
+    },
+  );
+
+  test(
+    'Catalog failure can be retried with an empty successful result',
+    () async {
+      var attempts = 0;
+      final service = MusicPlayerService(
+        player: FakePlayer(),
+        fetchSongs: () async {
+          if (attempts++ == 0) throw StateError('Offline');
+          return [];
+        },
+      )..onInit();
+      addTearDown(service.onClose);
+      await flush();
+      expect(service.songsError.value, isNotNull);
+      expect(service.isLoadingSongs.value, isFalse);
+      await service.loadSongs();
+      expect(service.songsError.value, isNull);
+      expect(service.songs, isEmpty);
+    },
+  );
+
+  test('Catalog completion after disposal does not update state', () async {
+    final pending = Completer<List<Song>>();
+    final service = MusicPlayerService(
+      player: FakePlayer(),
+      fetchSongs: () => pending.future,
+    )..onInit();
+    service.onClose();
+    pending.complete(localSongs);
+    await flush();
+    expect(service.songs, isEmpty);
+  });
+
   late FakePlayer player;
   late MusicPlayerService service;
   setUp(() {
     player = FakePlayer();
-    service = MusicPlayerService(player: player)..onInit();
+    service = MusicPlayerService(player: player, initialSongs: localSongs)
+      ..onInit();
   });
   tearDown(() => service.onClose());
 

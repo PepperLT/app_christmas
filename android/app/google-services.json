@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "34747851730",
+    "project_id": "christmas-app-311bc",
+    "storage_bucket": "christmas-app-311bc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:34747851730:android:af7fe3c882bdd08c131e0b",
+        "android_client_info": {
+          "package_name": "com.example.christmas_countdown"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_YfE3MnjUo8GctnVfgu5nklTZiBfLVWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

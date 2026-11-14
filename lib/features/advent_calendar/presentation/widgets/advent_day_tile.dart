@@ -20,8 +20,11 @@ class AdventDayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final enabled = isClaimed || (canClaim && !isMissed);
-    final label = isClaimed
+    final hasError = day.dataError != null;
+    final enabled = hasError || isClaimed || (canClaim && !isMissed);
+    final label = hasError
+        ? day.dataError!
+        : isClaimed
         ? 'Đã nhận'
         : isMissed
         ? 'Đã bỏ lỡ'
@@ -31,7 +34,7 @@ class AdventDayTile extends StatelessWidget {
     return Semantics(
       label: 'Ngày ${day.day}, $label',
       button: true,
-      enabled: enabled && onTap != null,
+      enabled: onTap != null,
       excludeSemantics: true,
       child: Tooltip(
         message: label,
@@ -46,7 +49,7 @@ class AdventDayTile extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: enabled ? onTap : null,
+            onTap: onTap,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -76,7 +79,17 @@ class AdventDayTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (isClaimed)
+                if (hasError)
+                  const Positioned(
+                    right: 5,
+                    bottom: 5,
+                    child: Icon(
+                      Icons.error_outline,
+                      color: Color(0xFF923E36),
+                      size: 23,
+                    ),
+                  ),
+                if (isClaimed && !hasError)
                   const Positioned(
                     right: 5,
                     bottom: 5,

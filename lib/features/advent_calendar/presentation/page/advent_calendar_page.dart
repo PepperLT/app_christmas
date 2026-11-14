@@ -68,24 +68,33 @@ class _AdventCalendarPageState extends State<AdventCalendarPage>
     super.dispose();
   }
 
+  void _showMessage(String message) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.removeCurrentSnackBar();
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+    );
+  }
+
   Future<void> _openDay(AdventDay day) async {
     if (_showingReward || controller.isClaiming.value) return;
+    controller.errorMessage.value = null;
+    controller.refreshProgress();
+    final error = controller.errorForDay(day.day, allowClaimed: true);
+    if (error != null) {
+      _showMessage(error);
+      return;
+    }
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     _showingReward = true;
     try {
-      controller.refreshProgress();
       var newlyClaimed = false;
       if (!controller.isClaimed(day.day)) {
         newlyClaimed = await controller.claimDay(day.day);
         if (!mounted) return;
         if (!newlyClaimed) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                controller.errorMessage.value ??
-                    'Chỉ được nhận quà đúng ngày, không nhận bù.',
-              ),
-            ),
-          );
+          _showMessage(controller.errorMessage.value!);
           return;
         }
       }
@@ -95,6 +104,9 @@ class _AdventCalendarPageState extends State<AdventCalendarPage>
         builder: (_) =>
             AdventRewardDialog(day: day, isNewlyClaimed: newlyClaimed),
       );
+      if (mounted && !newlyClaimed) {
+        _showMessage('Bạn đã nhận quà ngày ${day.day} rồi.');
+      }
     } finally {
       _showingReward = false;
     }
@@ -132,65 +144,89 @@ class _AdventCalendarPageState extends State<AdventCalendarPage>
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
-            child: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const _DecemberBanner(),
-                        const SizedBox(height: 14),
-                        Obx(
-                          () => _AdventProgress(
-                            claimedCount: controller.claimedCount,
-                            dayCount: controller.days.length,
-                            totalStars: controller.totalStars,
+            child: RefreshIndicator(
+              onRefresh: controller.loadDays,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const _DecemberBanner(),
+                          const SizedBox(height: 14),
+                          Obx(
+                            () => _AdventProgress(
+                              claimedCount: controller.claimedCount,
+                              dayCount: controller.days.length,
+                              totalStars: controller.totalStars,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 5,
-                          crossAxisSpacing: 6,
-                          mainAxisSpacing: 8,
-                        ),
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final day = controller.days[index];
-                      return Obx(
-                        () => AdventDayTile(
-                          day: day,
-                          isClaimed: controller.isClaimed(day.day),
-                          canClaim: controller.canClaimToday(day.day),
-                          isMissed: controller.isMissed(day.day),
-                          onTap: () => _openDay(day),
-                        ),
-                      );
-                    }, childCount: controller.days.length),
-                  ),
-                ),
-                const SliverPadding(
-                  padding: EdgeInsets.fromLTRB(20, 16, 20, 24),
-                  sliver: SliverToBoxAdapter(
-                    child: Text(
-                      'Mỗi ô quà chỉ mở vào đúng ngày, từ 1 đến 25/12.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        height: 1.4,
-                        color: Color(0xFF80524B),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return const SliverToBoxAdapter(
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    final error = controller.loadError.value;
+                    if (error != null) {
+                      return SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(error, textAlign: TextAlign.center),
+                        ),
+                      );
+                    }
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
+                  }),
+                  Obx(() {
+                    final visibleDays = controller.days.toList();
+                    return SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverGrid(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 5,
+                              crossAxisSpacing: 6,
+                              mainAxisSpacing: 8,
+                            ),
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final day = visibleDays[index];
+                          return Obx(
+                            () => AdventDayTile(
+                              day: day,
+                              isClaimed: controller.isClaimed(day.day),
+                              canClaim: controller.canClaimToday(day.day),
+                              isMissed: controller.isMissed(day.day),
+                              onTap: () => _openDay(day),
+                            ),
+                          );
+                        }, childCount: visibleDays.length),
+                      ),
+                    );
+                  }),
+                  const SliverPadding(
+                    padding: EdgeInsets.fromLTRB(20, 16, 20, 24),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        'Mỗi ô quà chỉ mở vào đúng ngày, từ 1 đến 25/12.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.4,
+                          color: Color(0xFF80524B),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,16 +1,64 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
-import 'package:just_audio/just_audio.dart';
 
-import 'local_songs.dart';
-import '../domain/entities/song.dart';
-import '../../premium/data/premium_service.dart';
+import '../../domain/entities/song.dart';
+import '../../domain/song_repository.dart';
+import '../../domain/music_player.dart';
 
-class MusicPlayerService extends GetxService {
-  MusicPlayerService({AudioPlayer? player}) : _player = player ?? AudioPlayer();
+/// App-wide music state. Infrastructure is injected through domain contracts.
+/// The compatibility service preserves the existing GetX lifecycle ownership.
+class MusicController extends GetxService {
+  MusicController({
+    required MusicPlayer player,
+    required bool Function(Song) canAccess,
+    Stream<bool> Function()? accessChanges,
+    SongRepository? repository,
+    List<Song> initialSongs = const [],
+  }) : _player = player,
+       _canAccess = canAccess,
+       _accessChanges = accessChanges,
+       _repository = repository,
+       songs = initialSongs.toList().obs;
 
-  final AudioPlayer _player;
+  final SongRepository? _repository;
+  final bool Function(Song) _canAccess;
+  final Stream<bool> Function()? _accessChanges;
+  final RxList<Song> songs;
+  final isLoadingSongs = false.obs;
+  final songsError = RxnString();
+
+  Future<void>? _catalogRequest;
+
+  Future<void> loadSongs() {
+    if (_closed || _repository == null) return Future.value();
+    return _catalogRequest ??= _loadSongs().whenComplete(() {
+      _catalogRequest = null;
+    });
+  }
+
+  Future<void> _loadSongs() async {
+    isLoadingSongs.value = true;
+    songsError.value = null;
+    try {
+      final result = await _repository!.fetchSongs();
+      if (_closed) return;
+      songs.assignAll(result);
+      if (selectedSongId.value != null &&
+          !songs.any((song) => song.id == selectedSongId.value)) {
+        selectedSongId.value = null;
+        _requestPlayback();
+      }
+    } catch (_) {
+      if (!_closed) {
+        songsError.value = 'Không thể tải danh sách bài hát. Vui lòng thử lại.';
+      }
+    } finally {
+      if (!_closed) isLoadingSongs.value = false;
+    }
+  }
+
+  final MusicPlayer _player;
   final playMusic = false.obs;
   final selectedSongId = RxnString();
   final isBusy = false.obs;
@@ -27,7 +75,29 @@ class MusicPlayerService extends GetxService {
   Stream<Duration?> get durationStream => _player.durationStream;
   Duration get position => _player.position;
   Duration? get duration => _player.duration;
-  bool canAccess(Song song) => !song.isPremium || PremiumService.isUnlocked;
+  bool canAccess(Song song) => _canAccess(song);
+
+  /// Finds the next accessible song, wrapping at the end of the catalog.
+  /// Returns null if the current song is missing or no other song is accessible.
+  Song? nextSongOf(Song currentSong) => _adjacentSongOf(currentSong, 1);
+
+  /// Finds the previous accessible song, wrapping at the start of the catalog.
+  /// Returns null if the current song is missing or no other song is accessible.
+  Song? previousSongOf(Song currentSong) => _adjacentSongOf(currentSong, -1);
+
+  Song? _adjacentSongOf(Song currentSong, int direction) {
+    final currentIndex = songs.indexWhere((song) => song.id == currentSong.id);
+    if (currentIndex < 0) return null;
+
+    for (var offset = 1; offset < songs.length; offset++) {
+      final index = (currentIndex + direction * offset) % songs.length;
+      final candidate = songs[index];
+      if (candidate.id != currentSong.id && canAccess(candidate)) {
+        return candidate;
+      }
+    }
+    return null;
+  }
 
   void seekSong(Song song, Duration position) {
     if (_closed ||
@@ -47,31 +117,28 @@ class MusicPlayerService extends GetxService {
 
   int _revision = 0;
   bool _closed = false;
-  StreamSubscription<PlayerException>? _errors;
-  StreamSubscription<PlayerState>? _states;
+  StreamSubscription<Object>? _errors;
+  StreamSubscription<bool>? _states;
   StreamSubscription<bool>? _premiumChanges;
 
   @override
   void onInit() {
     super.onInit();
-    if (Get.isRegistered<PremiumService>()) {
-      _premiumChanges = Get.find<PremiumService>().accessChanges.listen((_) {
-        final selected = localSongs.where(
-          (song) => song.id == selectedSongId.value,
-        );
-        if (!_closed && selected.isNotEmpty && !canAccess(selected.first)) {
-          selectedSongId.value = null;
-          _requestPlayback();
-        }
-      });
-    }
+    unawaited(loadSongs());
+    _premiumChanges = _accessChanges?.call().listen((_) {
+      final selected = songs.where((song) => song.id == selectedSongId.value);
+      if (!_closed && selected.isNotEmpty && !canAccess(selected.first)) {
+        selectedSongId.value = null;
+        _requestPlayback();
+      }
+    });
     _errors = _player.errorStream.listen((exception) {
       if (!_closed && playMusic.value && selectedSongId.value != null) {
         error.value = 'Không thể phát nhạc. Vui lòng thử lại.';
       }
     });
-    _states = _player.playerStateStream.listen((state) {
-      if (!_closed) isPlaying.value = state.playing;
+    _states = _player.playingStream.listen((playing) {
+      if (!_closed) isPlaying.value = playing;
     });
   }
 
@@ -89,17 +156,39 @@ class MusicPlayerService extends GetxService {
     _requestPlayback();
   }
 
-  void retry() {
-    if (!_closed) {
+  bool _retrying = false;
+
+  Future<void> retry() async {
+    if (_closed || _retrying) return;
+    final revision = _revision;
+    final songId = selectedSongId.value;
+    _retrying = true;
+    try {
+      if (_repository != null) {
+        await loadSongs();
+        if (songsError.value != null) return;
+      }
+      // Do not restart an old selection after a switch, pause or disposal.
+      if (_closed || revision != _revision || selectedSongId.value != songId) {
+        return;
+      }
       _pauseRequested = false;
       _requestPlayback();
+    } finally {
+      _retrying = false;
     }
   }
 
   // Returns false when the app-wide music switch is off.
   bool playSong(Song song) {
+    final latest = songs.where((item) => item.id == song.id);
+    if (latest.isNotEmpty) song = latest.first;
     if (_closed || !playMusic.value || !canAccess(song)) return false;
-    if (isBusy.value) return true;
+    if (isBusy.value || isLoadingSongs.value) return true;
+    if (error.value != null && selectedSongId.value == song.id) {
+      unawaited(retry());
+      return true;
+    }
     final resume = loadedSongId.value == song.id && error.value == null;
     selectedSongId.value = song.id;
     _pauseRequested = false;
@@ -152,13 +241,13 @@ class MusicPlayerService extends GetxService {
           final songId = selectedSongId.value;
           if (!playMusic.value || songId == null) continue;
 
-          final song = localSongs.firstWhere((song) => song.id == songId);
+          final song = songs.firstWhere((song) => song.id == songId);
           if (!canAccess(song)) continue;
           loadingSongId.value = song.id;
-          await _player.setAsset(song.audioPath);
+          await _player.load(song.audioPath);
           if (_closed || revision != _revision) continue;
           loadedSongId.value = song.id;
-          await _player.setLoopMode(LoopMode.one);
+          await _player.loopCurrentSong();
           if (_closed || revision != _revision) continue;
           // A looping play future only completes when playback stops.
           unawaited(_startPlayback(revision));

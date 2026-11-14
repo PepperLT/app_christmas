@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:christmas_countdown/app/app_routes.dart';
 import 'package:christmas_countdown/app/christmas_app.dart';
-import 'package:christmas_countdown/features/music/data/local_songs.dart';
-import 'package:christmas_countdown/features/music/data/music_player_service.dart';
+import 'fixtures/local_songs.dart';
+import 'package:christmas_countdown/features/music/music_dependencies.dart';
+import 'package:christmas_countdown/features/music/presentation/page/music_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,13 +23,39 @@ class _TestAssets extends CachingAssetBundle {
 }
 
 void main() {
+  testWidgets('Pull to refresh reloads even an empty song catalog', (
+    tester,
+  ) async {
+    Get.testMode = true;
+    var requests = 0;
+    Get.put(
+      MusicPlayerService(
+        player: FakePlayer(),
+        fetchSongs: () async {
+          requests++;
+          return [];
+        },
+      ),
+    );
+    await tester.pumpWidget(
+      const GetMaterialApp(home: MusicPage(menuRoutes: {})),
+    );
+    await tester.pumpAndSettle();
+    expect(requests, 1);
+    await tester.drag(find.byType(ListView), const Offset(0, 400));
+    await tester.pumpAndSettle();
+    expect(requests, 2);
+    await tester.pumpWidget(const SizedBox.shrink());
+    Get.reset();
+  });
+
   testWidgets('Settings and Santa Songs share music state across routes', (
     tester,
   ) async {
     Get.testMode = true;
     final player = FakePlayer();
     final service = Get.put(
-      MusicPlayerService(player: player),
+      MusicPlayerService(player: player, initialSongs: localSongs),
       permanent: true,
     );
     service.toggleSong(localSongs.first);

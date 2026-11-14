@@ -2,27 +2,34 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 
-import '../../data/music_player_service.dart';
+import 'music_controller.dart';
 import '../../domain/entities/song.dart';
 
 class SongDetailController extends GetxController {
-  SongDetailController({
-    required this.song,
-    required MusicPlayerService service,
-  }) : _service = service;
+  SongDetailController({required Song song, required MusicController service})
+    : _song = song.obs,
+      _service = service;
 
-  final Song song;
-  final MusicPlayerService _service;
+  final Rx<Song> _song;
+  Song get song => _song.value;
+  final MusicController _service;
   final position = Duration.zero.obs;
   final duration = Duration.zero.obs;
   StreamSubscription<Duration>? _positionSubscription;
   StreamSubscription<Duration?>? _durationSubscription;
 
-  bool get isBusy => _service.isBusy.value;
+  bool get canAccess {
+    final latest = _service.songs.where((item) => item.id == song.id);
+    return _service.canAccess(latest.isEmpty ? song : latest.first);
+  }
+
+  bool get isBusy => _service.isBusy.value || _service.isLoadingSongs.value;
+  bool get canGoNext => !isBusy && _service.nextSongOf(song) != null;
+  bool get canGoPrevious => !isBusy && _service.previousSongOf(song) != null;
   bool get isActive => _service.loadedSongId.value == song.id;
   bool get isPlaying => isActive && _service.isPlaying.value;
   bool get isLoadingSong => _service.loadingSongId.value == song.id;
-  String? get error => _service.error.value;
+  String? get error => _service.songsError.value ?? _service.error.value;
   bool get canSeek =>
       (!isBusy || _service.isSeeking.value) &&
       isActive &&
@@ -57,6 +64,20 @@ class SongDetailController extends GetxController {
 
   void seekTo(Duration value) {
     if (canSeek) _service.seekSong(song, value);
+  }
+
+  // False asks the view to show the Play Music reminder.
+  bool nextSong() => _switchSong(_service.nextSongOf(song));
+
+  bool previousSong() => _switchSong(_service.previousSongOf(song));
+
+  bool _switchSong(Song? target) {
+    if (isClosed || isBusy || target == null) return true;
+    if (!_service.playSong(target)) return false;
+    _song.value = target;
+    position.value = Duration.zero;
+    duration.value = Duration.zero;
+    return true;
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'package:christmas_countdown/features/premium/presentation/widgets/premium_components.dart';
 import 'package:get/get.dart';
-import 'package:christmas_countdown/features/music/data/music_player_service.dart';
-import 'package:christmas_countdown/features/music/data/local_songs.dart';
+import 'package:christmas_countdown/features/music/music_dependencies.dart';
+import 'fixtures/local_songs.dart';
 import 'package:christmas_countdown/features/music/presentation/page/music_page.dart';
 import 'package:christmas_countdown/features/premium/data/premium_service.dart';
 import 'package:christmas_countdown/features/premium/domain/premium_plan.dart';
@@ -72,7 +72,7 @@ void main() {
     (tester) async {
       Get.testMode = true;
       final player = FakePlayer();
-      Get.put(MusicPlayerService(player: player));
+      Get.put(MusicPlayerService(player: player, initialSongs: localSongs));
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);

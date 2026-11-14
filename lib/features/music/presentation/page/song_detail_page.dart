@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 
 import '../controllers/song_detail_controller.dart';
 import '../widgets/song_progress.dart';
+import '../widgets/song_image.dart';
 import '../../domain/entities/song.dart';
-import '../../../premium/data/premium_service.dart';
 import '../../../premium/presentation/widgets/premium_dialog.dart';
 
 class SongDetailPage extends GetView<SongDetailController> {
@@ -24,9 +24,11 @@ class SongDetailPage extends GetView<SongDetailController> {
         foregroundColor: const Color(0xFF70343B),
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
-          song.title,
-          style: const TextStyle(fontWeight: FontWeight.w700),
+        title: Obx(
+          () => Text(
+            controller.song.title,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
         ),
       ),
       body: SafeArea(
@@ -55,15 +57,17 @@ class SongDetailPage extends GetView<SongDetailController> {
                       borderRadius: BorderRadius.circular(20),
                       child: AspectRatio(
                         aspectRatio: 1,
-                        child: Image.asset(
-                          song.imagePath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const ColoredBox(
-                            color: Color(0xFFFFE3DF),
-                            child: Icon(
-                              Icons.music_note,
-                              size: 96,
-                              color: Color(0xFFB4232B),
+                        child: Obx(
+                          () => SongImage(
+                            controller.song.imagePath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => const ColoredBox(
+                              color: Color(0xFFFFE3DF),
+                              child: Icon(
+                                Icons.music_note,
+                                size: 96,
+                                color: Color(0xFFB4232B),
+                              ),
                             ),
                           ),
                         ),
@@ -72,6 +76,7 @@ class SongDetailPage extends GetView<SongDetailController> {
                   ),
                   const SizedBox(height: 32),
                   Obx(() {
+                    final song = controller.song;
                     final busy = controller.isBusy;
                     final playing = controller.isPlaying;
                     final loadingThisSong = controller.isLoadingSong;
@@ -94,36 +99,66 @@ class SongDetailPage extends GetView<SongDetailController> {
                           ),
                           const SizedBox(height: 12),
                         ],
-                        IconButton.filled(
-                          tooltip: playing ? 'Pause' : 'Play',
-                          iconSize: 42,
-                          style: IconButton.styleFrom(
-                            fixedSize: const Size(80, 80),
-                            shape: const CircleBorder(),
-                            backgroundColor: const Color(0xFFB4232B),
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: const Color(0xFFE3ADA6),
-                            disabledForegroundColor: Colors.white70,
-                          ),
-                          onPressed: busy
-                              ? null
-                              : () {
-                                  if (song.isPremium &&
-                                      !PremiumService.isUnlocked) {
-                                    showPremiumDialog(context);
-                                    return;
-                                  }
-                                  if (!controller.togglePlayback()) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Hãy bật Play Music ở Santa Songs để phát nhạc.',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                          icon: Icon(playing ? Icons.pause : Icons.play_arrow),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              tooltip: 'Bài trước',
+                              iconSize: 36,
+                              color: const Color(0xFFB4232B),
+                              onPressed: controller.canGoPrevious
+                                  ? () {
+                                      if (!controller.previousSong()) {
+                                        _showPlayMusicReminder(context);
+                                      }
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.skip_previous_rounded),
+                            ),
+                            const SizedBox(width: 16),
+                            IconButton.filled(
+                              tooltip: playing ? 'Pause' : 'Play',
+                              iconSize: 42,
+                              style: IconButton.styleFrom(
+                                fixedSize: const Size(80, 80),
+                                shape: const CircleBorder(),
+                                backgroundColor: const Color(0xFFB4232B),
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: const Color(
+                                  0xFFE3ADA6,
+                                ),
+                                disabledForegroundColor: Colors.white70,
+                              ),
+                              onPressed: busy
+                                  ? null
+                                  : () {
+                                      if (!controller.canAccess) {
+                                        showPremiumDialog(context);
+                                        return;
+                                      }
+                                      if (!controller.togglePlayback()) {
+                                        _showPlayMusicReminder(context);
+                                      }
+                                    },
+                              icon: Icon(
+                                playing ? Icons.pause : Icons.play_arrow,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            IconButton(
+                              tooltip: 'Bài tiếp theo',
+                              iconSize: 36,
+                              color: const Color(0xFFB4232B),
+                              onPressed: controller.canGoNext
+                                  ? () {
+                                      if (!controller.nextSong()) {
+                                        _showPlayMusicReminder(context);
+                                      }
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.skip_next_rounded),
+                            ),
+                          ],
                         ),
                         if (error != null) ...[
                           const SizedBox(height: 16),
@@ -138,6 +173,14 @@ class SongDetailPage extends GetView<SongDetailController> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showPlayMusicReminder(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Hãy bật Play Music ở Santa Songs để phát nhạc.'),
       ),
     );
   }

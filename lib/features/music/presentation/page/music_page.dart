@@ -4,16 +4,20 @@ import 'package:christmas_countdown/core/widget/christmas_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../data/local_songs.dart';
-import '../../data/music_player_service.dart';
+import '../../music_dependencies.dart';
+import '../controllers/music_controller.dart';
 import '../bindings/song_detail_binding.dart';
+import '../widgets/song_image.dart';
 import 'song_detail_page.dart';
 import '../../../premium/presentation/widgets/premium_dialog.dart';
 
-class MusicPage extends GetView<MusicPlayerService> {
+class MusicPage extends GetView<MusicController> {
   const MusicPage({super.key, required this.menuRoutes});
 
   final Map<ChristmasMenuItem, String> menuRoutes;
+
+  @override
+  MusicController get controller => findMusicController();
 
   @override
   Widget build(BuildContext context) {
@@ -50,178 +54,201 @@ class MusicPage extends GetView<MusicPlayerService> {
           final error = controller.error.value;
           final selectedSongId = controller.selectedSongId.value;
 
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            children: [
-              Card(
-                color: Colors.white,
-                elevation: 0,
-                margin: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFFF0DFDC)),
-                ),
-                child: SwitchListTile(
-                  secondary: const Icon(
-                    Icons.music_note_rounded,
-                    color: accentColor,
+          return RefreshIndicator(
+            onRefresh: controller.loadSongs,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              children: [
+                Card(
+                  color: Colors.white,
+                  elevation: 0,
+                  margin: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: Color(0xFFF0DFDC)),
                   ),
-                  title: const Text(
-                    'Play Music',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  value: controller.playMusic.value,
-                  activeTrackColor: selectedColor,
-                  onChanged: controller.setPlayMusic,
-                ),
-              ),
-              if (controller.isBusy.value) const LinearProgressIndicator(),
-              if (error != null)
-                ListTile(
-                  title: Text(error),
-                  trailing: TextButton(
-                    onPressed: controller.retry,
-                    child: const Text('Thử lại'),
-                  ),
-                ),
-              const SizedBox(height: 28),
-              for (final song in localSongs)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: ListTile(
-                    minTileHeight: 112,
-                    horizontalTitleGap: 16,
-                    tileColor: song.isPremium
-                        ? const Color(0xFFFFFCFA)
-                        : const Color(0xFFFFF6F3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: const BorderSide(color: Color(0xFFF3B5AC)),
+                  child: SwitchListTile(
+                    secondary: const Icon(
+                      Icons.music_note_rounded,
+                      color: accentColor,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
+                    title: const Text(
+                      'Play Music',
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    onTap: () => !controller.canAccess(song)
-                        ? showPremiumDialog(context)
-                        : Get.to(
-                            () => SongDetailPage(song: song),
-                            binding: SongDetailBinding(song),
-                          ),
-                    title: Row(
-                      children: [
-                        Container(
-                          width: song.isPremium ? 80 : 70,
-                          height: song.isPremium ? 80 : 90,
-                          padding: EdgeInsets.all(song.isPremium ? 0 : 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF6AAA0),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFEA9186)),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(7),
-                            child: Image.asset(
-                              song.imagePath,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => const ColoredBox(
-                                color: Color(0xFFFFE3DF),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.music_note,
-                                    color: accentColor,
+                    value: controller.playMusic.value,
+                    activeTrackColor: selectedColor,
+                    onChanged: controller.setPlayMusic,
+                  ),
+                ),
+                if (controller.isLoadingSongs.value)
+                  const LinearProgressIndicator(),
+                if (controller.songsError.value != null)
+                  ListTile(
+                    title: Text(controller.songsError.value!),
+                    trailing: TextButton(
+                      onPressed: controller.loadSongs,
+                      child: const Text('Thử lại'),
+                    ),
+                  ),
+                if (!controller.isLoadingSongs.value &&
+                    controller.songsError.value == null &&
+                    controller.songs.isEmpty)
+                  const ListTile(title: Text('Chưa có bài hát nào.')),
+                if (controller.isBusy.value) const LinearProgressIndicator(),
+                if (error != null)
+                  ListTile(
+                    title: Text(error),
+                    trailing: TextButton(
+                      onPressed: controller.retry,
+                      child: const Text('Thử lại'),
+                    ),
+                  ),
+                const SizedBox(height: 28),
+                for (final song in controller.songs)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: ListTile(
+                      minTileHeight: 112,
+                      horizontalTitleGap: 16,
+                      tileColor: song.isPremium
+                          ? const Color(0xFFFFFCFA)
+                          : const Color(0xFFFFF6F3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: const BorderSide(color: Color(0xFFF3B5AC)),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                      onTap: () => !controller.canAccess(song)
+                          ? showPremiumDialog(context)
+                          : Get.to(
+                              () => SongDetailPage(song: song),
+                              binding: SongDetailBinding(song),
+                            ),
+                      title: Row(
+                        children: [
+                          Container(
+                            width: song.isPremium ? 80 : 70,
+                            height: song.isPremium ? 80 : 90,
+                            padding: EdgeInsets.all(song.isPremium ? 0 : 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF6AAA0),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFEA9186),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(7),
+                              child: SongImage(
+                                song.imagePath,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => const ColoredBox(
+                                  color: Color(0xFFFFE3DF),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.music_note,
+                                      color: accentColor,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                song.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 19,
-                                  color: song.isPremium
-                                      ? const Color(0xFF24202A)
-                                      : const Color(0xFF70343B),
-                                  fontWeight: song.isPremium
-                                      ? FontWeight.w800
-                                      : FontWeight.w600,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  song.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 19,
+                                    color: song.isPremium
+                                        ? const Color(0xFF24202A)
+                                        : const Color(0xFF70343B),
+                                    fontWeight: song.isPremium
+                                        ? FontWeight.w800
+                                        : FontWeight.w600,
+                                  ),
                                 ),
-                              ),
-                              if (song.isPremium &&
-                                  !controller.canAccess(song)) ...[
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFFEBCF),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        '👑',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Flexible(
-                                        child: Text(
-                                          'Premium',
-                                          style: TextStyle(
-                                            color: Color(0xFF873C28),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
+                                if (song.isPremium &&
+                                    !controller.canAccess(song)) ...[
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFEBCF),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '👑',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Flexible(
+                                          child: Text(
+                                            'Premium',
+                                            style: TextStyle(
+                                              color: Color(0xFF873C28),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      iconSize: 32,
-                      tooltip: selectedSongId == song.id
-                          ? 'Bỏ chọn ${song.title}'
-                          : 'Chọn ${song.title}',
-                      icon: !controller.canAccess(song)
-                          ? const Icon(
-                              Icons.lock_outline_rounded,
-                              color: Color(0xFFC32932),
-                            )
-                          : selectedSongId == song.id
-                          ? const Icon(Icons.check_circle, color: selectedColor)
-                          : const Icon(
-                              Icons.radio_button_unchecked,
-                              color: Colors.grey,
                             ),
-                      onPressed: () {
-                        if (!controller.canAccess(song)) {
-                          showPremiumDialog(context);
-                          return;
-                        }
-                        controller.toggleSong(song);
-                      },
+                          ),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        iconSize: 32,
+                        tooltip: selectedSongId == song.id
+                            ? 'Bỏ chọn ${song.title}'
+                            : 'Chọn ${song.title}',
+                        icon: !controller.canAccess(song)
+                            ? const Icon(
+                                Icons.lock_outline_rounded,
+                                color: Color(0xFFC32932),
+                              )
+                            : selectedSongId == song.id
+                            ? const Icon(
+                                Icons.check_circle,
+                                color: selectedColor,
+                              )
+                            : const Icon(
+                                Icons.radio_button_unchecked,
+                                color: Colors.grey,
+                              ),
+                        onPressed: () {
+                          if (!controller.canAccess(song)) {
+                            showPremiumDialog(context);
+                            return;
+                          }
+                          controller.toggleSong(song);
+                        },
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           );
         }),
       ),

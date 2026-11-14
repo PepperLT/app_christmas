@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../../../music/data/music_player_service.dart';
+import '../../../music/music_dependencies.dart';
 import '../../../../core/services/snowfall_service.dart';
 import '../../../../core/services/sound_effects_service.dart';
 

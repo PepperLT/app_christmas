@@ -8,7 +8,7 @@ class PremiumService extends GetxService {
       : Get.put(PremiumService(), permanent: true);
 
   final selectedPlan = PremiumPlan.yearly.obs;
-  final _hasPremium = false.obs;
+  final _hasPremium = true.obs;
 
   void selectPlan(PremiumPlan plan) => selectedPlan.value = plan;
   bool get hasPremium => _hasPremium.value;

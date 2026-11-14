@@ -1,4 +1,4 @@
-import '../domain/entity/advent_day.dart';
+import 'package:christmas_countdown/features/advent_calendar/domain/entity/advent_day.dart';
 
 const localAdventDays = <AdventDay>[
   AdventDay(

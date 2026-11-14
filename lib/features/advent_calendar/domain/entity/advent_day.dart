@@ -4,6 +4,7 @@ class AdventDay {
   final String message;
   final String? imageAsset;
   final int rewardStars;
+  final String? dataError;
 
   const AdventDay({
     required this.day,
@@ -11,5 +12,6 @@ class AdventDay {
     required this.message,
     this.imageAsset,
     this.rewardStars = 10,
+    this.dataError,
   });
 }

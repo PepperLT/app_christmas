@@ -1,20 +1,28 @@
 import 'package:get/get.dart';
 
-import '../../data/advent_progress_service.dart';
-import '../../data/local_advent_days.dart';
+import '../../domain/advent_progress_repository.dart';
+import '../../domain/advent_day_repository.dart';
+import '../../domain/entity/advent_day.dart';
 import '../../../../core/services/sound_effects_service.dart';
 
 class AdventCalendarController extends GetxController {
   AdventCalendarController({
-    required AdventProgressService progressService,
+    required AdventProgressRepository progressService,
+    required AdventDayRepository dayRepository,
     DateTime Function()? now,
   }) : _progressService = progressService,
+       _dayRepository = dayRepository,
        _now = now ?? DateTime.now;
 
-  final AdventProgressService _progressService;
+  final AdventProgressRepository _progressService;
+  final AdventDayRepository _dayRepository;
   final DateTime Function() _now;
 
-  final days = localAdventDays;
+  final days = <AdventDay>[].obs;
+  final isLoading = false.obs;
+  final loadError = RxnString();
+  int? _contentYear;
+  int _requestId = 0;
   final claimedDays = <int>{}.obs;
   final isClaiming = false.obs;
   final errorMessage = RxnString();
@@ -33,6 +41,33 @@ class AdventCalendarController extends GetxController {
     final today = _now();
     currentDate.value = today;
     _loadYear(today.year);
+    if (_contentYear != today.year) {
+      loadDays();
+    }
+  }
+
+  Future<void> loadDays() async {
+    final year = _now().year;
+    final requestId = ++_requestId;
+    if (_contentYear != year) days.clear();
+    _contentYear = year;
+    isLoading.value = true;
+    loadError.value = null;
+    errorMessage.value = null;
+    try {
+      final loaded = await _dayRepository.fetchDays(year);
+      if (isClosed || requestId != _requestId) return;
+      days.assignAll(loaded);
+    } on FormatException catch (error) {
+      if (isClosed || requestId != _requestId) return;
+      loadError.value = 'Dữ liệu lịch $year không hợp lệ: ${error.message}';
+    } catch (_) {
+      if (isClosed || requestId != _requestId) return;
+      loadError.value =
+          'Không thể tải lịch $year. Kiểm tra kết nối rồi thử lại.';
+    } finally {
+      if (!isClosed && requestId == _requestId) isLoading.value = false;
+    }
   }
 
   bool isMissed(int day) {
@@ -67,8 +102,27 @@ class AdventCalendarController extends GetxController {
       .where((day) => isClaimed(day.day))
       .fold<int>(0, (total, day) => total + day.rewardStars);
 
+  String? errorForDay(int day, {bool allowClaimed = false}) {
+    final today = _now();
+    final item = days.firstWhereOrNull((item) => item.day == day);
+    if (_contentYear != today.year || item == null) {
+      return 'Ngày $day chưa có dữ liệu hợp lệ.';
+    }
+    if (item.dataError != null) return item.dataError;
+    if (isClaimed(day)) {
+      return allowClaimed ? null : 'Bạn đã nhận quà ngày $day rồi.';
+    }
+    if (day < 1 || day > 25) return 'Ngày nhận quà không hợp lệ.';
+    if (today.month != 12)
+      return 'Chỉ được nhận quà từ ngày 1 đến 25 tháng 12.';
+    if (day > today.day) return 'Chưa đến ngày $day để nhận quà.';
+    if (day < today.day) return 'Đã bỏ lỡ quà ngày $day, không thể nhận bù.';
+    return null;
+  }
+
   Future<bool> claimDay(int day) async {
     if (isClaiming.value) return false;
+    errorMessage.value = null;
 
     final today = _now();
 
@@ -76,13 +130,8 @@ class AdventCalendarController extends GetxController {
       _loadYear(today.year);
     }
 
-    if (today.month != 12 ||
-        day < 1 ||
-        day > 25 ||
-        day != today.day ||
-        isClaimed(day)) {
-      return false;
-    }
+    errorMessage.value = errorForDay(day);
+    if (errorMessage.value != null) return false;
 
     isClaiming.value = true;
     errorMessage.value = null;

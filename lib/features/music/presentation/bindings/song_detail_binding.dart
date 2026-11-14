@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../../data/music_player_service.dart';
+import '../../music_dependencies.dart';
 import '../../domain/entities/song.dart';
 import '../controllers/song_detail_controller.dart';
 
@@ -12,10 +12,7 @@ class SongDetailBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<SongDetailController>(
-      () => SongDetailController(
-        song: song,
-        service: Get.find<MusicPlayerService>(),
-      ),
+      () => SongDetailController(song: song, service: findMusicController()),
       tag: song.id,
     );
   }
