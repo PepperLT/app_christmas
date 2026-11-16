@@ -113,8 +113,9 @@ class AdventCalendarController extends GetxController {
       return allowClaimed ? null : 'Bạn đã nhận quà ngày $day rồi.';
     }
     if (day < 1 || day > 25) return 'Ngày nhận quà không hợp lệ.';
-    if (today.month != 12)
+    if (today.month != 12) {
       return 'Chỉ được nhận quà từ ngày 1 đến 25 tháng 12.';
+    }
     if (day > today.day) return 'Chưa đến ngày $day để nhận quà.';
     if (day < today.day) return 'Đã bỏ lỡ quà ngày $day, không thể nhận bù.';
     return null;

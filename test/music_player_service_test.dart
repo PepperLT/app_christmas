@@ -96,7 +96,7 @@ void main() {
     final service = MusicPlayerService(
       player: player,
       fetchSongs: () async {
-        return refresh == null ? localSongs : await refresh!.future;
+        return refresh == null ? localSongs : await refresh.future;
       },
     )..onInit();
     addTearDown(service.onClose);
