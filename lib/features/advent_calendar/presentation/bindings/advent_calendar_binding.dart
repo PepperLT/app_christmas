@@ -18,7 +18,7 @@ class AdventCalendarBinding extends Bindings {
         progressService: Get.find<AdventProgressRepository>(),
         dayRepository: Get.find<AdventDayRepository>(),
         // test 1 ô quà ngày đầu tiên
-        // now: () => DateTime(2026, 12, 3, 12),
+        // now: () => DateTime(2026, 12, 2, 12),
       ),
     );
   }
