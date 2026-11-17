@@ -22,7 +22,7 @@ class FirestoreAdventDayRepository implements AdventDayRepository {
 
     AdventDay failed(int day, String error) => AdventDay(
       day: day,
-      title: 'Lỗi dữ liệu',
+      title: 'Data Error',
       message: error,
       rewardStars: 0,
       dataError: error,
@@ -40,31 +40,28 @@ class FirestoreAdventDayRepository implements AdventDayRepository {
         final idDay = int.tryParse(doc.id);
         if (idDay != null && idDay >= 1 && idDay <= 25) {
           seenDays.add(idDay);
-          days[idDay] = failed(
-            idDay,
-            'Ngày $idDay có trường day không hợp lệ.',
-          );
+          days[idDay] = failed(idDay, 'Day $idDay has an invalid day field.');
         }
         continue;
       }
 
       if (!seenDays.add(day)) {
-        days[day] = failed(day, 'Trùng nội dung ngày $day.');
+        days[day] = failed(day, 'Duplicate content for December $day.');
         continue;
       }
 
       if (title is! String || title.trim().isEmpty) {
-        days[day] = failed(day, 'Ngày $day thiếu tiêu đề hợp lệ.');
+        days[day] = failed(day, 'Missing a valid title for December $day.');
         continue;
       }
 
       if (message is! String || message.trim().isEmpty) {
-        days[day] = failed(day, 'Ngày $day thiếu lời nhắn hợp lệ.');
+        days[day] = failed(day, 'Missing a valid message for December $day.');
         continue;
       }
 
       if (rewardStars is! int || rewardStars < 0) {
-        days[day] = failed(day, 'Ngày $day có số sao không hợp lệ.');
+        days[day] = failed(day, 'Invalid reward stars for December $day.');
         continue;
       }
 
@@ -78,7 +75,7 @@ class FirestoreAdventDayRepository implements AdventDayRepository {
 
     return List.generate(25, (index) {
       final day = index + 1;
-      return days[day] ?? failed(day, 'Chưa có dữ liệu ngày $day.');
+      return days[day] ?? failed(day, 'No data available for December $day.');
     });
   }
 }

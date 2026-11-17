@@ -39,9 +39,13 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      await tester.ensureVisible(find.text('Tuyệt vời!'));
+      final closeButton = find.widgetWithText(TextButton, 'Awesome!');
+      expect(find.byType(AdventRewardDialog), findsOneWidget);
+      expect(find.text('Congratulations!'), findsOneWidget);
+      expect(closeButton, findsOneWidget);
+      await tester.ensureVisible(closeButton);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Tuyệt vời!'));
+      await tester.tap(closeButton);
       await tester.pumpAndSettle();
       expect(find.byType(AdventRewardDialog), findsNothing);
       expect(tester.takeException(), isNull);

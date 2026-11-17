@@ -24,11 +24,18 @@ class _Assets extends CachingAssetBundle {
   }
 }
 
+// Exercise the retained checkout flow without changing production access.
+class _LockedPremiumService extends PremiumService {
+  @override
+  bool get hasPremium => false;
+}
+
 void main() {
   tearDown(() => Get.reset());
   testWidgets('Checkout reflects selected plan and can return to change it', (
     tester,
   ) async {
+    Get.put<PremiumService>(_LockedPremiumService());
     await tester.pumpWidget(
       DefaultAssetBundle(
         bundle: _Assets(),
@@ -37,6 +44,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     final next = find.text('Tiếp tục thanh toán');
+    expect(next, findsOneWidget);
     await tester.ensureVisible(next);
     await tester.pumpAndSettle();
     await tester.tap(next);
@@ -71,6 +79,7 @@ void main() {
     'Locked music and Premium page share plan selection and checkout',
     (tester) async {
       Get.testMode = true;
+      Get.put<PremiumService>(_LockedPremiumService());
       final player = FakePlayer();
       Get.put(MusicPlayerService(player: player, initialSongs: localSongs));
       tester.view.physicalSize = const Size(320, 568);
@@ -99,6 +108,7 @@ void main() {
       await tester.tap(find.text('Hàng tháng'));
       await tester.pump();
       expect(PremiumService.instance.selectedPlan.value, PremiumPlan.monthly);
+      expect(find.text('Tiếp tục thanh toán'), findsOneWidget);
       await tester.ensureVisible(find.text('Tiếp tục thanh toán'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Tiếp tục thanh toán'));
@@ -126,4 +136,56 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('Default access opens premium music without checkout', (
+    tester,
+  ) async {
+    Get.testMode = true;
+    final premium = Get.put(PremiumService());
+    final player = FakePlayer();
+    final music = Get.put(
+      MusicPlayerService(player: player, initialSongs: localSongs),
+    );
+    music.setPlayMusic(true);
+    expect(premium.hasPremium, isTrue);
+    await tester.pumpWidget(
+      DefaultAssetBundle(
+        bundle: _Assets(),
+        child: const MaterialApp(home: MusicPage(menuRoutes: {})),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final song = localSongs.firstWhere((song) => song.isPremium);
+    await tester.scrollUntilVisible(
+      find.text(song.title),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    final selectSong = find.byTooltip('Chọn ${song.title}');
+    expect(selectSong, findsOneWidget);
+    await tester.ensureVisible(selectSong);
+    await tester.pumpAndSettle();
+    await tester.tap(selectSong);
+    await tester.pumpAndSettle();
+    expect(player.loads, 1);
+    expect(music.selectedSongId.value, song.id);
+    expect(find.byType(PremiumDialog), findsNothing);
+    expect(find.byType(PremiumCheckoutDialog), findsNothing);
+    await tester.pumpWidget(
+      DefaultAssetBundle(
+        bundle: _Assets(),
+        child: const MaterialApp(home: PremiumPage()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final unlocked = find.widgetWithText(
+      PremiumActionButton,
+      'Đã mở khóa Premium',
+    );
+    expect(unlocked, findsOneWidget);
+    expect(tester.widget<PremiumActionButton>(unlocked).onPressed, isNull);
+    expect(find.text('Tiếp tục thanh toán'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

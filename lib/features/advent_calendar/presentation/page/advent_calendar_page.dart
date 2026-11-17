@@ -105,7 +105,9 @@ class _AdventCalendarPageState extends State<AdventCalendarPage>
             AdventRewardDialog(day: day, isNewlyClaimed: newlyClaimed),
       );
       if (mounted && !newlyClaimed) {
-        _showMessage('Bạn đã nhận quà ngày ${day.day} rồi.');
+        _showMessage(
+          'You have already claimed your gift for December ${day.day}',
+        );
       }
     } finally {
       _showingReward = false;
@@ -215,7 +217,7 @@ class _AdventCalendarPageState extends State<AdventCalendarPage>
                     padding: EdgeInsets.fromLTRB(20, 16, 20, 24),
                     sliver: SliverToBoxAdapter(
                       child: Text(
-                        'Mỗi ô quà chỉ mở vào đúng ngày, từ 1 đến 25/12.',
+                        'Each gift can only be opened on its corresponding date, from December 1st to 25th.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13,
@@ -258,7 +260,7 @@ class _DecemberBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '1–25 THÁNG 12',
+                    'December 1–25',
                     style: TextStyle(
                       color: Color(0xFFFFDE9E),
                       fontSize: 12,
@@ -332,14 +334,14 @@ class _AdventProgress extends StatelessWidget {
             runSpacing: 6,
             children: [
               Text(
-                'Đã nhận $claimedCount/$dayCount quà',
+                '$claimedCount/$dayCount gifts claimed',
                 style: const TextStyle(
                   color: Color(0xFF602729),
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
-                '★ $totalStars sao',
+                '★ $totalStars star',
                 style: const TextStyle(
                   color: Color(0xFF825411),
                   fontWeight: FontWeight.w700,
@@ -354,7 +356,7 @@ class _AdventProgress extends StatelessWidget {
               value: dayCount == 0
                   ? 0.0
                   : (claimedCount / dayCount).clamp(0.0, 1.0).toDouble(),
-              semanticsLabel: 'Tiến độ nhận quà',
+              semanticsLabel: 'Gift Claim Progress',
               minHeight: 6,
               backgroundColor: const Color(0xFFF8E5DF),
               color: const Color(0xFFAF303D),

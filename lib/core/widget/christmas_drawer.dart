@@ -94,7 +94,9 @@ class ChristmasDrawer extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-            for (final item in ChristmasMenuItem.values)
+            for (final item in ChristmasMenuItem.values.where(
+              (item) => item != ChristmasMenuItem.premium,
+            ))
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: ListTile(

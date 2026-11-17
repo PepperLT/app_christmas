@@ -30,7 +30,7 @@ class AdventProgressService implements AdventProgressRepository {
     );
 
     if (!saved) {
-      throw StateError('Không thể lưu tiến độ nhận quà.');
+      throw StateError('Unable to save gift claim progress.');
     }
   }
 }

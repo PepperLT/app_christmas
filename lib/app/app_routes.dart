@@ -9,7 +9,6 @@ class AppRoutes {
   static const bubbleBox = '/bubble-box';
   static const wallpapers = '/wallpapers';
   static const about = '/about';
-  static const premium = '/premium';
 }
 
 const christmasMenuRoutes = <ChristmasMenuItem, String>{
@@ -21,5 +20,4 @@ const christmasMenuRoutes = <ChristmasMenuItem, String>{
   ChristmasMenuItem.bubbleBox: AppRoutes.bubbleBox,
   ChristmasMenuItem.wallpapers: AppRoutes.wallpapers,
   ChristmasMenuItem.about: AppRoutes.about,
-  ChristmasMenuItem.premium: AppRoutes.premium,
 };

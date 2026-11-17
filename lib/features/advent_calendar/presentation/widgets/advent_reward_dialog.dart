@@ -67,13 +67,13 @@ class AdventRewardDialog extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Ngày ${day.day}',
+                      'Day ${day.day}',
                       textAlign: TextAlign.center,
                       style: headline,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isNewlyClaimed ? 'Chúc mừng bạn!' : 'Quà của bạn!',
+                      isNewlyClaimed ? 'Congratulations!' : 'Your Gift!',
                       textAlign: TextAlign.center,
                       style: headline,
                     ),
@@ -105,7 +105,7 @@ class AdventRewardDialog extends StatelessWidget {
                     Text(
                       isNewlyClaimed
                           ? '+${day.rewardStars} Sao'
-                          : 'Đã nhận ${day.rewardStars} Sao',
+                          : 'Claimed ${day.rewardStars} Star',
                       textAlign: TextAlign.center,
                       style: headline,
                     ),
@@ -181,7 +181,7 @@ class AdventRewardDialog extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        child: Text(isNewlyClaimed ? 'Tuyệt vời!' : 'Đóng'),
+                        child: Text(isNewlyClaimed ? 'Awesome!' : 'Close'),
                       ),
                     ),
                   ],
@@ -227,7 +227,7 @@ class AdventRewardDialog extends StatelessWidget {
                     ],
                   ),
                   child: IconButton(
-                    tooltip: 'Đóng',
+                    tooltip: 'Close',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close_rounded, color: red, size: 27),
                   ),

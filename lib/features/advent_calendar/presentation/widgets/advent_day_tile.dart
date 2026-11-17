@@ -25,14 +25,14 @@ class AdventDayTile extends StatelessWidget {
     final label = hasError
         ? day.dataError!
         : isClaimed
-        ? 'Đã nhận'
+        ? 'Claimed'
         : isMissed
-        ? 'Đã bỏ lỡ'
+        ? 'Missed'
         : canClaim
-        ? 'Nhận quà'
-        : 'Chưa đến ngày';
+        ? 'Claim Gift'
+        : 'Not Yet Available';
     return Semantics(
-      label: 'Ngày ${day.day}, $label',
+      label: 'Day ${day.day}, $label',
       button: true,
       enabled: onTap != null,
       excludeSemantics: true,

@@ -60,11 +60,11 @@ class AdventCalendarController extends GetxController {
       days.assignAll(loaded);
     } on FormatException catch (error) {
       if (isClosed || requestId != _requestId) return;
-      loadError.value = 'Dữ liệu lịch $year không hợp lệ: ${error.message}';
+      loadError.value = 'Invalid calendar data for $year: ${error.message}';
     } catch (_) {
       if (isClosed || requestId != _requestId) return;
       loadError.value =
-          'Không thể tải lịch $year. Kiểm tra kết nối rồi thử lại.';
+          'Unable to load the $year calendar. Check your connection and try again.';
     } finally {
       if (!isClosed && requestId == _requestId) isLoading.value = false;
     }
@@ -105,19 +105,32 @@ class AdventCalendarController extends GetxController {
   String? errorForDay(int day, {bool allowClaimed = false}) {
     final today = _now();
     final item = days.firstWhereOrNull((item) => item.day == day);
+
     if (_contentYear != today.year || item == null) {
-      return 'Ngày $day chưa có dữ liệu hợp lệ.';
+      return 'No valid data available for December $day.';
     }
+
     if (item.dataError != null) return item.dataError;
+
     if (isClaimed(day)) {
-      return allowClaimed ? null : 'Bạn đã nhận quà ngày $day rồi.';
+      return allowClaimed
+          ? null
+          : 'You have already claimed your gift for December $day.';
     }
-    if (day < 1 || day > 25) return 'Ngày nhận quà không hợp lệ.';
+
+    if (day < 1 || day > 25) {
+      return 'Invalid gift claim date.';
+    }
+
     if (today.month != 12) {
-      return 'Chỉ được nhận quà từ ngày 1 đến 25 tháng 12.';
+      return 'Gifts can only be claimed from December 1st to 25th.';
     }
-    if (day > today.day) return 'Chưa đến ngày $day để nhận quà.';
-    if (day < today.day) return 'Đã bỏ lỡ quà ngày $day, không thể nhận bù.';
+    if (day > today.day) {
+      return 'Your gift for December $day is not available yet.';
+    }
+    if (day < today.day) {
+      return 'You missed your gift for December $day. It can no longer be claimed.';
+    }
     return null;
   }
 
@@ -154,7 +167,7 @@ class AdventCalendarController extends GetxController {
       SoundEffectsService.emit(SoundEffect.reward);
       return true;
     } catch (_) {
-      errorMessage.value = 'Không thể lưu tiến độ. Hãy thử lại.';
+      errorMessage.value = 'Unable to save progress. Please try again.';
       return false;
     } finally {
       isClaiming.value = false;
