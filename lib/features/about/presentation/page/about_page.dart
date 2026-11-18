@@ -4,6 +4,7 @@ import '../../../../app/app_routes.dart';
 import '../../../../core/widget/app_menu_button.dart';
 import '../../../../core/widget/christmas_drawer.dart';
 import '../../../../core/widget/shareable_scaffold.dart';
+import 'privacy_policy_page.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -183,7 +184,7 @@ class AboutPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 14),
                           const Text(
-                            'Một chút háo hức, một chút ấm áp.\nGiáng sinh đến gần hơn mỗi ngày.',
+                            'A little excitement, a little warmth.\nChristmas gets closer every day.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: _muted,
@@ -199,7 +200,7 @@ class AboutPage extends StatelessWidget {
               ),
               const SizedBox(height: 28),
               const Text(
-                'Niềm vui \ntrong những ngày chờ đợi',
+                'Joy in\nthe waiting',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: _wine,
@@ -209,7 +210,7 @@ class AboutPage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Christmas Countdown mang không khí lễ hội đến những khoảnh khắc thường ngày: đếm ngược đến Giáng sinh, mở quà Advent và thư giãn cùng âm nhạc, trò chơi nhỏ.',
+                'Christmas Countdown brings the festive spirit to your everyday life: count down to Christmas, open Advent gifts, and unwind with music and fun mini-games.',
                 style: TextStyle(color: _muted, fontSize: 17, height: 1.7),
               ),
               const SizedBox(height: 22),
@@ -223,9 +224,9 @@ class AboutPage extends StatelessWidget {
                   children: [
                     _Feature(
                       icon: Icons.timer_outlined,
-                      title: 'Chờ đón Giáng sinh',
+                      title: 'Waiting for Christmas',
                       description:
-                          'Đếm từng ngày, giờ, phút và giây đến mùa lễ hội.',
+                          'Count down the days, hours, minutes, and seconds until the festive season.',
                       color: Color(0xFFA73E4C),
                     ),
                     Divider(
@@ -236,9 +237,9 @@ class AboutPage extends StatelessWidget {
                     ),
                     _Feature(
                       icon: Icons.card_giftcard_rounded,
-                      title: 'Một món quà mỗi ngày',
+                      title: 'A Gift Every Day',
                       description:
-                          'Khám phá Advent Calendar từ ngày 1 đến 25/12.',
+                          'Explore the Advent Calendar from December 1 to 25.',
                       color: Color(0xFF98601A),
                     ),
                     Divider(
@@ -249,9 +250,9 @@ class AboutPage extends StatelessWidget {
                     ),
                     _Feature(
                       icon: Icons.music_note_rounded,
-                      title: 'Giai điệu & niềm vui',
+                      title: 'Music & Joy',
                       description:
-                          'Nghe nhạc Giáng sinh và chơi gộp vật phẩm Bubble Box.',
+                          'Enjoy Christmas music and merge items in the Bubble Box mini-game.',
                       color: Color(0xFF316B55),
                     ),
                     Divider(
@@ -262,9 +263,9 @@ class AboutPage extends StatelessWidget {
                     ),
                     _Feature(
                       icon: Icons.wallpaper_rounded,
-                      title: 'Giáng sinh theo cách của bạn',
+                      title: 'Christmas Your Way',
                       description:
-                          'Chọn ảnh nền Countdown và bật tuyết rơi trong Settings.',
+                          'Choose your Countdown wallpaper and enable snowfall in Settings.',
                       color: Color(0xFF71508E),
                     ),
                   ],
@@ -295,11 +296,20 @@ class AboutPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Chúc bạn một mùa Giáng sinh an lành.',
+                'Wishing you a peaceful Christmas.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: _muted, fontSize: 15, height: 1.6),
               ),
               const SizedBox(height: 12),
+              TextButton.icon(
+                icon: const Icon(Icons.privacy_tip_outlined),
+                label: const Text('Privacy Policy'),
+                onPressed: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const PrivacyPolicyPage(),
+                  ),
+                ),
+              ),
               Image.asset(
                 'assets/images/footer.png',
                 fit: BoxFit.contain,

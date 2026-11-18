@@ -1,4 +1,4 @@
-package com.example.christmas_countdown
+package com.santa.christmascountdown
 
 import io.flutter.embedding.android.FlutterActivity
 

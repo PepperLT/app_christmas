@@ -52,12 +52,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC_YfE3MnjUo8GctnVfgu5nklTZiBfLVWw',
-    appId: '1:34747851730:android:af7fe3c882bdd08c131e0b',
+    appId: '1:34747851730:android:dc5dc48100edfbf6131e0b',
     messagingSenderId: '34747851730',
     projectId: 'christmas-app-311bc',
     storageBucket: 'christmas-app-311bc.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCdIRtIiw5KqQmzgFYzR2YbdSRQnfQiiZ8',
     appId: '1:34747851730:ios:d878f5254bcf7e94131e0b',
@@ -66,7 +65,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'christmas-app-311bc.firebasestorage.app',
     iosBundleId: 'com.example.christmasCountdown',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCdIRtIiw5KqQmzgFYzR2YbdSRQnfQiiZ8',
     appId: '1:34747851730:ios:d878f5254bcf7e94131e0b',

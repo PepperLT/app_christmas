@@ -14,7 +14,7 @@ class WallpapersController extends GetxController {
       await service.select(asset);
       return true;
     } catch (_) {
-      error.value = 'Không thể lưu ảnh nền. Hãy thử lại.';
+      error.value = 'Unable to save wallpaper. Please try again.';
       return false;
     } finally {
       saving.value = false;

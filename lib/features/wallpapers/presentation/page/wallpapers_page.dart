@@ -36,7 +36,7 @@ class WallpapersPage extends GetView<WallpapersController> {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Đóng',
+                      tooltip: 'Close',
                       onPressed: () => Navigator.pop(dialogContext),
                       icon: const Icon(Icons.close),
                     ),
@@ -100,15 +100,17 @@ class WallpapersPage extends GetView<WallpapersController> {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Đã đổi ảnh nền Countdown'),
+                                      content: Text(
+                                        'The Countdown wallpaper has been changed.',
+                                      ),
                                     ),
                                   );
                                 }
                               },
                         child: Text(
                           controller.saving.value
-                              ? 'Đang lưu…'
-                              : 'Dùng cho Countdown',
+                              ? 'Saving…'
+                              : 'For use in Countdown events',
                         ),
                       ),
                     ],
@@ -163,7 +165,7 @@ class WallpapersPage extends GetView<WallpapersController> {
           itemCount: WallpaperService.assets.length,
           itemBuilder: (context, index) {
             final asset = WallpaperService.assets[index];
-            final label = index == 0 ? 'Mặc định' : 'Giáng sinh $index';
+            final label = index == 0 ? 'Default' : 'Christmas $index';
             return Obx(() {
               final selected = controller.service.selectedAsset.value == asset;
               return Semantics(

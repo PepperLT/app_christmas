@@ -91,12 +91,12 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                         children: [
                           _stat(
                             Icons.star_rounded,
-                            'Điểm ván: ${controller.score.value}',
+                            'Game Score: ${controller.score.value}',
                             const Color(0xFFFFB52E),
                           ),
                           _stat(
                             Icons.auto_awesome_rounded,
-                            '${controller.rescuesRemaining.value} lượt cứu',
+                            '${controller.rescuesRemaining.value} rescue',
                             const Color(0xFFEC777C),
                           ),
                         ],
@@ -124,8 +124,8 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                             final selected = selectedIndex == index;
                             return Semantics(
                               label: item == null
-                                  ? 'Ô trống'
-                                  : '${item.type.name}, cấp ${item.level}',
+                                  ? 'Empty space'
+                                  : '${item.type.name}, Level ${item.level}',
                               selected: selected,
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 160),
@@ -192,7 +192,7 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                                                 ),
                                                 FittedBox(
                                                   child: Text(
-                                                    'Cấp ${item.level}',
+                                                    'Level ${item.level}',
                                                     style: const TextStyle(
                                                       color: ink,
                                                       fontSize: 11,
@@ -225,7 +225,7 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                               size: 20,
                             ),
                             label: Text(
-                              'Cứu bàn (${controller.rescuesRemaining.value} lượt)',
+                              '	Rescue (${controller.rescuesRemaining.value} turn)',
                             ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: ink,
@@ -246,7 +246,7 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                           FilledButton.icon(
                             onPressed: controller.newGame,
                             icon: const Icon(Icons.refresh_rounded, size: 22),
-                            label: const Text('Ván mới'),
+                            label: const Text('New Game'),
                             style: FilledButton.styleFrom(
                               backgroundColor: const Color(0xFFEA737A),
                               foregroundColor: Colors.white,
@@ -278,7 +278,7 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                           children: [
                             if (isGameOver) ...[
                               const Text(
-                                'Hết nước đi',
+                                'No more moves!',
                                 style: TextStyle(
                                   color: ink,
                                   fontSize: 19,
@@ -289,8 +289,8 @@ class BubbleBoxPage extends GetView<BubbleBoxController> {
                             ],
                             Text(
                               selectedIndex == null
-                                  ? 'Chọn một vật phẩm để bắt đầu.'
-                                  : 'Chọn vật phẩm cùng loại và cùng cấp để gộp.',
+                                  ? 'Select an item to start.'
+                                  : 'Select items of the same type and level to combine.',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: ink,
