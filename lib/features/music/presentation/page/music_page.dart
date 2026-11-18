@@ -89,20 +89,20 @@ class MusicPage extends GetView<MusicController> {
                     title: Text(controller.songsError.value!),
                     trailing: TextButton(
                       onPressed: controller.loadSongs,
-                      child: const Text('Thử lại'),
+                      child: const Text('Retry'),
                     ),
                   ),
                 if (!controller.isLoadingSongs.value &&
                     controller.songsError.value == null &&
                     controller.songs.isEmpty)
-                  const ListTile(title: Text('Chưa có bài hát nào.')),
+                  const ListTile(title: Text('There are no songs yet.')),
                 if (controller.isBusy.value) const LinearProgressIndicator(),
                 if (error != null)
                   ListTile(
                     title: Text(error),
                     trailing: TextButton(
                       onPressed: controller.retry,
-                      child: const Text('Thử lại'),
+                      child: const Text('Retry'),
                     ),
                   ),
                 const SizedBox(height: 28),
@@ -221,8 +221,8 @@ class MusicPage extends GetView<MusicController> {
                       trailing: IconButton(
                         iconSize: 32,
                         tooltip: selectedSongId == song.id
-                            ? 'Bỏ chọn ${song.title}'
-                            : 'Chọn ${song.title}',
+                            ? 'Deselect ${song.title}'
+                            : 'Select ${song.title}',
                         icon: !controller.canAccess(song)
                             ? const Icon(
                                 Icons.lock_outline_rounded,

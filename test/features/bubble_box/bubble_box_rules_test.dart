@@ -120,10 +120,11 @@ void main() {
       expect(controller.selectedIndex.value, isNull);
     }
     await tester.pump();
-    expect(find.text('Hết nước đi'), findsOneWidget);
+    expect(find.text('No more moves!'), findsOneWidget);
     final savedScore = controller.score.value;
-    expect(find.text('Cứu bàn (1 lượt)'), findsOneWidget);
-    await tester.tap(find.text('Cứu bàn (1 lượt)'));
+    final rescue = find.text('\tRescue (1 turn)');
+    expect(rescue, findsOneWidget);
+    await tester.tap(rescue);
     await tester.pump();
     expect(controller.score.value, savedScore);
     expect(controller.rescuesRemaining.value, 0);
@@ -134,8 +135,10 @@ void main() {
       controller.selectCell(indices[1]);
     }
     await tester.pump();
-    expect(find.text('Cứu bàn (0 lượt)'), findsOneWidget);
-    await tester.tap(find.text('Ván mới'));
+    expect(find.text('\tRescue (0 turn)'), findsOneWidget);
+    final newGame = find.text('New Game');
+    expect(newGame, findsOneWidget);
+    await tester.tap(newGame);
     await tester.pump();
     expect(controller.rescuesRemaining.value, 1);
     expect(controller.score.value, 0);
@@ -149,6 +152,6 @@ void main() {
       isTrue,
     );
     expect(controller.isGameOver.value, isFalse);
-    expect(find.text('Hết nước đi'), findsNothing);
+    expect(find.text('No more moves!'), findsNothing);
   });
 }

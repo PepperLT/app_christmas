@@ -1,73 +1,84 @@
-# Test Report — Christmas Countdown
+# Christmas Countdown - Test Report
 
-## 1. Review scope and environment
+## 1. Project Information
 
-- Documentation review date: November 18, 2026 (Asia/Bangkok).
-- Application version: `1.0.0+1` in `pubspec.yaml`.
-- Android application ID: `com.santa.christmascountdown` in Gradle.
-- Workspace: `D:\app_countdown\christmas_countdown`; Windows PowerShell.
-- Local resolved-package metadata records Flutter `3.38.5` and Dart/pub `3.10.4`. SDK version commands were not rerun during this documentation review.
-- Working tree contains uncommitted application/configuration changes. No immutable release candidate or signed artifact was selected.
-- No emulator model, physical-device model, Android OS version or release artifact has been verified for manual testing in this review.
-- This review modifies only documentation. Flutter commands were not rerun because they can regenerate files outside `docs/`.
+| Item | Details |
+|---|---|
+| Application | Christmas Countdown |
+| Version | 1.0.0+1 |
+| Android application ID | com.santa.christmascountdown |
+| Test date | November 18, 2026 (Asia/Bangkok) |
+| Environment | Windows, PowerShell, Flutter 3.38.5 stable, Dart 3.10.4 |
+| Execution scope | Current working tree; host unit/widget tests with fake players, repositories and mock preferences |
+| Device / release artifact | No physical-device or emulator session; no signed release artifact tested |
+| Review changes | Only this report edited; no source, test cases, dependencies or backend configuration changed |
 
-## 2. Automated testing
+## 2. Test Summary
 
-Results below were directly observed in tool output earlier in this conversation on November 18, 2026, after the bundled Privacy Policy page was added. They are historical working-tree results, not certification of a final release binary. Raw console logs have not been saved as a repository artifact.
-
-| Check | Verified evidence | Status for this docs-only review |
+| Metric / command | Result | Status |
 |---|---|---|
-| `flutter analyze` | Exit code 0; `No issues found!` | NOT RUN again; earlier PASS |
-| `flutter test --reporter expanded` | Exit code 0; `+65: All tests passed!` | NOT RUN again; earlier PASS: 65 passed, 0 failed |
-| Signed AAB build and signature verification | No result observed | NOT RUN |
-| Final release-candidate automated rerun | No selected release candidate | NOT RUN |
-| Native/merged manifest and release dependency audit | No release artifact inspected | NOT RUN |
+| Total tests | 65 per full-suite run | PASSED |
+| Successful tests | 65 | PASSED |
+| Failed tests | 0 | PASSED |
+| Success rate | 100% | PASSED |
+| `flutter analyze` | Exit 0; No issues found; 8.1 seconds reported | PASSED |
+| `flutter test` | Exit 0; 65 passed, 0 failed; 21 seconds reported | PASSED |
+| `flutter test --coverage` | Exit 0; 65 passed, 0 failed; 33 seconds reported | PASSED |
+| Line coverage | 74.86%: 1,346 / 1,798 executable lines across 52 recorded files | PASSED |
 
-The 65-test total includes the About-to-Privacy-Policy navigation/offline asset test. Earlier failed development attempts were followed by the successful run above; only the final observed result is reported as passing.
+Coverage was calculated from unique SF/DA records in the newly generated `coverage/lcov.info`. It describes instrumented Dart files, not all repository code, native SDKs or backend rules. No branch-coverage percentage or coverage acceptance threshold is claimed. The two full-suite runs execute the same 65 cases and are not counted as 130 distinct tests.
 
-## 3. Functional coverage and remaining checks
+## 3. Functional Testing
 
-Existing test files provide unit/widget coverage; filenames or assertions do not prove production backend or hardware behavior. These manual results are NOT RUN in the evidence available for this review.
+Statuses below apply only to observed automated assertions. Real-device acceptance is not implied.
 
-| Area | Existing automated test evidence in repository | Manual release status |
-|---|---|---|
-| Countdown and sharing | `countdown_share_test.dart`, `shareable_scaffold_test.dart` | NOT RUN: real date/year rollover and recipient apps |
-| Music and song detail | `music_player_service_test.dart`, `music_url_playback_test.dart`, `song_detail_controller_test.dart` | NOT RUN: real local/remote playback, interruptions and device audio |
-| Firestore mapping | `firestore_song_repository_test.dart`, `firestore_advent_day_repository_test.dart` | NOT RUN: deployed content, permissions and service failures |
-| Advent rules and rendering | `advent_calendar_controller_test.dart`, `advent_reward_dialog_test.dart` | NOT RUN: device dates, December boundaries, yearly reset and restart |
-| Bubble Box | Board, rescue, stress and rules tests under `test/` | NOT RUN: touch play, reset and long-session device behavior |
-| Backgrounds and settings | `wallpapers_test.dart`, `settings_music_test.dart`, `snowfall_test.dart`, `sound_effects_test.dart` | NOT RUN: restart persistence, performance and large text |
-| Premium behavior | `premium_content_test.dart`, `premium_checkout_test.dart` | NOT RUN: final-build navigation and absence of real checkout |
-| Privacy Policy | `privacy_policy_test.dart` | NOT RUN: physical-device offline readability and public URL access |
+| Feature | Test Description | Status | Notes |
+|---|---|---|---|
+| Welcome | Initial app route renders Welcome and title | PASSED | `widget_test.dart`; real launch and Welcome tap-to-Countdown flow not independently tested |
+| Countdown | Drawer share request order and screenshot content | PASSED | `countdown_share_test.dart`; exact Dec 25/26 and year rollover NOT RUN |
+| Music | Selection, pause/resume, seeking, rapid input, failed load/retry, remote-source selection and disposal | PASSED | Music player, URL and detail tests use fakes; real codec/audio focus/stream availability NOT RUN |
+| Advent Calendar | Date locks, duplicate claims, stars, year rollover, invalid content, retry and reward dialog layout | PASSED | Controller, Firestore mapper and dialog tests; live backend and device-date boundaries NOT RUN |
+| Bubble Box | Merge rules, rescue, reset, invalid actions and deterministic stress | PASSED | 1,000 games; 19,010 merges; min 4, max 41, average 19.01; not an FPS benchmark |
+| Wallpapers | Valid apply, persistence, invalid path fallback and small-landscape preview | PASSED | In-app Countdown backgrounds only; no system wallpaper setting |
+| Settings | Shared music state and persisted snowfall/sound-effect preferences | PASSED | Mock preferences/fake audio; actual process restart and device storage durability NOT RUN |
+| About | Open bundled Privacy Policy, read/scroll and navigate back | PASSED | `privacy_policy_test.dart`; no verified public policy URL |
+| Share | Capture PNG, exclude menu and dispatch one injected share request | PASSED | Countdown and shared scaffold tests; actual recipient applications NOT RUN |
+| Navigation | Initial route, settings/music state across routes and About/policy return | PASSED | Covered route interactions only; exhaustive back-stack and route lifecycle testing NOT RUN |
 
-## 4. Manual release testing
+All local audio/image paths in `test/fixtures/local_songs.dart` currently exist. This static check does not verify decoding or production Firestore paths. Premium access defaults to unlocked, its menu is hidden and named route removed; retained Premium code is not a connected real payment implementation.
 
-| Check | Device/build | Result |
-|---|---|---|
-| Signed release installation, label and launcher icon | Not selected | NOT RUN |
-| App startup and production Firebase/media access | Not selected | NOT RUN |
-| Offline startup, slow network, broken URLs and retry | Not selected | NOT RUN |
-| Small screen, landscape, large text and accessibility | Not selected | NOT RUN |
-| App background/resume, audio interruptions and stability | Not selected | NOT RUN |
-| Data clearing, preferences and Advent progress after restart | Not selected | NOT RUN |
-| Screenshot generation and system sharing recipients | Not selected | NOT RUN |
-| Play testing-track installation and pre-launch report | Not selected | NOT RUN |
-| Security Rules, Storage policies and production log review | Backend not audited | NOT RUN |
+## 4. Non-functional Testing
 
-## 5. Known issues and verification limits
+| Area | Check | Status | Notes |
+|---|---|---|---|
+| Performance | Bubble Box logical stress; fake-player stale-request/disposal behavior | PASSED | Existing automated assertions succeeded |
+| Performance | Timer, subscriptions and resource cleanup review | NOT VERIFIED | Countdown/Advent timers, Music/detail subscriptions and animation/player/image disposal are present; source review is not proof of leak-free device behavior |
+| Performance | FPS, heap growth, CPU, battery, real playback latency and repeated navigation | NOT RUN | Profile-mode/device measurements required |
+| Security | Deployed Firestore Rules and Supabase Storage Policies | NOT VERIFIED | No deployed policy evidence or production access available |
+| Security | Release signing configuration | FAILED | Release Gradle selects debug signing; see REL-01 |
+| Security | Permissions, client keys and transport | NOT VERIFIED | Main manifest declares INTERNET; client/publishable keys are present; loaders accept HTTP and HTTPS. Merged manifest, full secret history and live URL security were not audited |
+| Local Storage | Snowfall, sound effects, wallpaper and Advent preferences/duplicate-claim behavior | PASSED | Mock persistence tests; stars derive from claimed days and calendar data |
+| Local Storage | Music switch/selection restoration, OS backup and process-death recovery | NOT VERIFIED | Music values and Bubble Box board are currently memory-only; whether persistence is required needs developer confirmation |
+| Network and Offline | Fake repository failures, malformed data, retry, late responses and audio failures | PASSED | No production writes or live service requests performed |
+| Network and Offline | Real outage, slow network, timeouts, reconnect, TLS/codec and image-server failures | NOT RUN | Source lacks application deadlines for catalog/audio loading; see NET-01 |
+| UI/UX | Reward dialog portrait/landscape, wallpaper landscape, snowfall touch behavior and policy navigation | PASSED | Widget-test assertions only |
+| UI/UX | Physical-device layout, accessibility, large text, launcher presentation and manual release acceptance | NOT RUN | No confirmed manual PASSED evidence supplied for this run |
 
-- Release Gradle configuration still selects the debug signing key; production upload signing is not configured in the inspected file.
-- Public Privacy Policy URL is PENDING. About displays the bundled draft; it does not open a verified public URL.
-- The local asset rights register contains 42 UNVERIFIED entries; live remote media and Advent text rights remain unaudited.
-- Support-email handling, service logging/retention, processing locations and intended audience need developer confirmation.
-- Premium module/dialog code remains, although its menu is hidden, named route removed and access unlocked by default.
-- Wallpaper selection changes only the in-app Countdown background. It does not set the system wallpaper.
-- Music switch/selection and Bubble Box board are not persisted by current code; this is an implementation limitation, not a new defect.
-- Automated tests do not verify actual production media hosts, backend security, device behavior, licensing or legal compliance.
-- No claim is made that the project is free of defects; release-only issues remain unassessed.
+## 5. Known Issues
 
-## 6. Release readiness
+Static risks are identified as such; they are not fabricated production failures.
 
-**Decision: NOT READY for production release on the available evidence.**
+| ID | Issue | Severity | Recommendation |
+|---|---|---|---|
+| REL-01 | `android/app/build.gradle.kts:40`: release uses debug signing. | Critical release blocker | Configure approved upload signing and verify the signed AAB before submission. |
+| NET-01 | `music_controller.dart:44,248`: repository fetch and audio load have no application timeout; a never-completing future can retain loading/busy state. Source-confirmed risk; not reproduced on a live network in this run. | High | Add bounded waits and safe retry/stale-response handling, with targeted tests, after approval. |
+| INIT-01 | `lib/main.dart:18-23`: Firebase, Supabase and preferences initialize before runApp without startup error handling. Failure may prevent the UI from opening. | High potential risk | Introduce approved startup recovery and test initialization exceptions and pending requests. |
+| SEC-01 | Production rules, policies, permissions and actual media hosts remain unverified. | High assurance gap | Audit deployed configuration read-only and validate access in emulator/staging. |
+| LEG-01 | Public Privacy Policy URL remains pending; `docs/legal/asset_rights_register.csv` is absent in the current working tree and media permissions are not established. | High release blocker | Supply licensing evidence and publish the reviewed policy; resolve privacy-practice confirmations. |
+| QA-01 | Current tests do not verify full startup, real calendar boundaries or actual platform playback/share behavior. | Medium coverage gap | Complete device/release acceptance tests and add approved focused coverage where needed. |
 
-Resolve the blockers and record final-candidate results in the [Release checklist](../deployment/release_checklist.md). Legal publication work is tracked in [Legal publication status](../deployment/legal_publication.md). Set the release commit, signed artifact/version, device environment, tester and date before signing off. Do not convert NOT RUN entries to PASS without execution evidence.
+## 6. Conclusion
+
+**Automated testing: PASSED.** Both complete runs finished with 65 successful tests and no failures; Flutter Analyze reported no issues. Current line coverage is 74.86% within the LCOV scope.
+
+**Deployment readiness: NOT VERIFIED; not ready for production approval.** Resolve the signing and legal blockers, review loading/startup risks, verify backend security, and complete manual signed-release testing. No release artifact was built or deployed. No source fixes or test modifications were made during this review.

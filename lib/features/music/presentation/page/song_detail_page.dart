@@ -94,8 +94,8 @@ class SongDetailPage extends GetView<SongDetailController> {
                           const SizedBox(height: 12),
                           Text(
                             loadingThisSong
-                                ? 'Đang tải ${song.title}…'
-                                : 'Đang xử lý…',
+                                ? 'Loading ${song.title}…'
+                                : 'Processing…',
                           ),
                           const SizedBox(height: 12),
                         ],
@@ -103,7 +103,7 @@ class SongDetailPage extends GetView<SongDetailController> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
-                              tooltip: 'Bài trước',
+                              tooltip: 'Previous Article',
                               iconSize: 36,
                               color: const Color(0xFFB4232B),
                               onPressed: controller.canGoPrevious
@@ -146,7 +146,7 @@ class SongDetailPage extends GetView<SongDetailController> {
                             ),
                             const SizedBox(width: 16),
                             IconButton(
-                              tooltip: 'Bài tiếp theo',
+                              tooltip: 'Next article',
                               iconSize: 36,
                               color: const Color(0xFFB4232B),
                               onPressed: controller.canGoNext
@@ -163,7 +163,7 @@ class SongDetailPage extends GetView<SongDetailController> {
                         if (error != null) ...[
                           const SizedBox(height: 16),
                           Text(error, textAlign: TextAlign.center),
-                          const Text('Nhấn Play để thử lại.'),
+                          const Text('Press Play to try again.'),
                         ],
                       ],
                     );
@@ -180,7 +180,7 @@ class SongDetailPage extends GetView<SongDetailController> {
   void _showPlayMusicReminder(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Hãy bật Play Music ở Santa Songs để phát nhạc.'),
+        content: Text('Turn on Play Music in Santa Songs to play the music.'),
       ),
     );
   }

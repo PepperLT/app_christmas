@@ -51,7 +51,8 @@ class MusicController extends GetxService {
       }
     } catch (_) {
       if (!_closed) {
-        songsError.value = 'Không thể tải danh sách bài hát. Vui lòng thử lại.';
+        songsError.value =
+            'The playlist could not be loaded. Please try again.';
       }
     } finally {
       if (!_closed) isLoadingSongs.value = false;
@@ -134,7 +135,7 @@ class MusicController extends GetxService {
     });
     _errors = _player.errorStream.listen((exception) {
       if (!_closed && playMusic.value && selectedSongId.value != null) {
-        error.value = 'Không thể phát nhạc. Vui lòng thử lại.';
+        error.value = 'Music cannot be played. Please try again.';
       }
     });
     _states = _player.playingStream.listen((playing) {
@@ -253,7 +254,7 @@ class MusicController extends GetxService {
           unawaited(_startPlayback(revision));
         } catch (_) {
           if (!_closed && revision == _revision) {
-            error.value = 'Không thể tải hoặc phát nhạc. Vui lòng thử lại.';
+            error.value = 'Unable to load or play music. Please try again.';
           }
         }
       }

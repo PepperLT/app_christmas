@@ -162,7 +162,7 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
-    final selectSong = find.byTooltip('Chọn ${song.title}');
+    final selectSong = find.byTooltip('Select ${song.title}');
     expect(selectSong, findsOneWidget);
     await tester.ensureVisible(selectSong);
     await tester.pumpAndSettle();
