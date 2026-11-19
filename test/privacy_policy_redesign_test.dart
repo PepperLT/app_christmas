@@ -35,7 +35,7 @@ void main() {
       final doc = PrivacyPolicyDocument.parse(source);
       expect(doc.source, source);
       expect(doc.sections, hasLength(10));
-      expect(doc.metadata('Last updated'), 'November 18, 2026');
+      expect(doc.metadata('Last updated'), 'November 19, 2026');
       expect(doc.metadata('Android package'), 'com.santa.christmascountdown');
       expect(doc.isDraft, isFalse);
       expect(doc.email, 'thaivku@gmail.com');

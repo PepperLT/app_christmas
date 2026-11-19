@@ -15,6 +15,8 @@ class MusicController extends GetxService {
     Stream<bool> Function()? accessChanges,
     SongRepository? repository,
     List<Song> initialSongs = const [],
+    this.playlistTimeout = const Duration(seconds: 15),
+    this.audioTimeout = const Duration(seconds: 20),
   }) : _player = player,
        _canAccess = canAccess,
        _accessChanges = accessChanges,
@@ -22,6 +24,8 @@ class MusicController extends GetxService {
        songs = initialSongs.toList().obs;
 
   final SongRepository? _repository;
+  final Duration playlistTimeout;
+  final Duration audioTimeout;
   final bool Function(Song) _canAccess;
   final Stream<bool> Function()? _accessChanges;
   final RxList<Song> songs;
@@ -29,33 +33,42 @@ class MusicController extends GetxService {
   final songsError = RxnString();
 
   Future<void>? _catalogRequest;
+  int _catalogGeneration = 0;
 
   Future<void> loadSongs() {
     if (_closed || _repository == null) return Future.value();
-    return _catalogRequest ??= _loadSongs().whenComplete(() {
-      _catalogRequest = null;
+    if (_catalogRequest != null) return _catalogRequest!;
+    final generation = ++_catalogGeneration;
+    return _catalogRequest = _loadSongs(generation).whenComplete(() {
+      if (generation == _catalogGeneration) _catalogRequest = null;
     });
   }
 
-  Future<void> _loadSongs() async {
+  Future<void> _loadSongs(int generation) async {
     isLoadingSongs.value = true;
     songsError.value = null;
     try {
-      final result = await _repository!.fetchSongs();
-      if (_closed) return;
+      final result = await _repository!.fetchSongs().timeout(playlistTimeout);
+      if (_closed || generation != _catalogGeneration) return;
+      final previous = selectedSong;
       songs.assignAll(result);
       if (selectedSongId.value != null &&
           !songs.any((song) => song.id == selectedSongId.value)) {
         selectedSongId.value = null;
         _requestPlayback();
+      } else if (previous != null &&
+          selectedSong?.audioPath != previous.audioPath) {
+        _requestPlayback();
       }
     } catch (_) {
-      if (!_closed) {
+      if (!_closed && generation == _catalogGeneration) {
         songsError.value =
             'The playlist could not be loaded. Please try again.';
       }
     } finally {
-      if (!_closed) isLoadingSongs.value = false;
+      if (!_closed && generation == _catalogGeneration) {
+        isLoadingSongs.value = false;
+      }
     }
   }
 
@@ -68,6 +81,9 @@ class MusicController extends GetxService {
   final isPlaying = false.obs;
   final loadedSongId = RxnString();
   final loadingSongId = RxnString();
+  String? _loadedAudioSource;
+  Song? get selectedSong =>
+      songs.firstWhereOrNull((song) => song.id == selectedSongId.value);
   bool _pauseRequested = false;
   bool _resumeRequested = false;
   Duration? _seekPosition;
@@ -186,11 +202,19 @@ class MusicController extends GetxService {
     if (latest.isNotEmpty) song = latest.first;
     if (_closed || !playMusic.value || !canAccess(song)) return false;
     if (isBusy.value || isLoadingSongs.value) return true;
+    if (songsError.value != null) {
+      selectedSongId.value = song.id;
+      unawaited(retry());
+      return true;
+    }
     if (error.value != null && selectedSongId.value == song.id) {
       unawaited(retry());
       return true;
     }
-    final resume = loadedSongId.value == song.id && error.value == null;
+    final resume =
+        loadedSongId.value == song.id &&
+        _loadedAudioSource == song.audioPath &&
+        error.value == null;
     selectedSongId.value = song.id;
     _pauseRequested = false;
     _requestPlayback(resume: resume);
@@ -220,38 +244,58 @@ class MusicController extends GetxService {
         final revision = _revision;
         appliedRevision = revision;
         try {
-          if (_pauseRequested) {
-            await _player.pause();
+          if (_pauseRequested &&
+              _loadedAudioSource == selectedSong?.audioPath) {
+            await _player.pause().timeout(audioTimeout);
             continue;
           }
           if (_resumeRequested &&
               playMusic.value &&
-              loadedSongId.value == selectedSongId.value) {
+              loadedSongId.value == selectedSongId.value &&
+              _loadedAudioSource == selectedSong?.audioPath) {
             final seek = _seekPosition;
             if (seek != null) {
               isSeeking.value = true;
-              await _player.seek(seek);
+              await _player.seek(seek).timeout(audioTimeout);
             }
             if (_closed || revision != _revision) continue;
             unawaited(_startPlayback(revision));
             continue;
           }
-          await _player.stop();
+          await _player.stop().timeout(audioTimeout);
+          if (_closed) return;
           loadedSongId.value = null;
+          _loadedAudioSource = null;
           if (_closed || revision != _revision) continue;
           final songId = selectedSongId.value;
-          if (!playMusic.value || songId == null) continue;
+          if (!playMusic.value || songId == null || _pauseRequested) continue;
 
           final song = songs.firstWhere((song) => song.id == songId);
           if (!canAccess(song)) continue;
           loadingSongId.value = song.id;
-          await _player.load(song.audioPath);
+          await _player.load(song.audioPath).timeout(audioTimeout);
           if (_closed || revision != _revision) continue;
           loadedSongId.value = song.id;
-          await _player.loopCurrentSong();
+          _loadedAudioSource = song.audioPath;
+          await _player.loopCurrentSong().timeout(audioTimeout);
           if (_closed || revision != _revision) continue;
           // A looping play future only completes when playback stops.
           unawaited(_startPlayback(revision));
+        } on TimeoutException {
+          if (_closed) return;
+          loadedSongId.value = null;
+          _loadedAudioSource = null;
+          isPlaying.value = false;
+          // Reset isolates late native operations on a retired player. A timeout
+          // alone would leave the same native instance free to overwrite a retry.
+          try {
+            await _player.reset().timeout(audioTimeout);
+          } catch (_) {
+            // The next operation can attempt recovery again; always clear busy.
+          }
+          if (!_closed && revision == _revision) {
+            error.value = 'Music loading timed out. Please try again.';
+          }
         } catch (_) {
           if (!_closed && revision == _revision) {
             error.value = 'Unable to load or play music. Please try again.';
@@ -281,6 +325,7 @@ class MusicController extends GetxService {
   void onClose() {
     _closed = true;
     _revision++;
+    _catalogGeneration++;
     unawaited(_errors?.cancel());
     unawaited(_states?.cancel());
     unawaited(_premiumChanges?.cancel());

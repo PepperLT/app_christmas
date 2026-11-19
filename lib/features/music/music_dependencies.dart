@@ -14,10 +14,16 @@ import 'presentation/controllers/music_controller.dart';
 class MusicPlayerService extends MusicController {
   MusicPlayerService({
     AudioPlayer? player,
+    AudioPlayer Function()? playerFactory,
     Future<List<Song>> Function()? fetchSongs,
     super.initialSongs,
+    super.playlistTimeout,
+    super.audioTimeout,
   }) : super(
-         player: JustAudioMusicPlayer(player: player),
+         player: JustAudioMusicPlayer(
+           player: player,
+           playerFactory: playerFactory,
+         ),
          canAccess: (song) => !song.isPremium || PremiumService.isUnlocked,
          accessChanges: () => Get.isRegistered<PremiumService>()
              ? Get.find<PremiumService>().accessChanges

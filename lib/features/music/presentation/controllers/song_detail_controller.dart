@@ -11,7 +11,9 @@ class SongDetailController extends GetxController {
       _service = service;
 
   final Rx<Song> _song;
-  Song get song => _song.value;
+  Song get song =>
+      _service.songs.firstWhereOrNull((item) => item.id == _song.value.id) ??
+      _song.value;
   final MusicController _service;
   final position = Duration.zero.obs;
   final duration = Duration.zero.obs;
@@ -55,6 +57,7 @@ class SongDetailController extends GetxController {
   // False asks the view to show the Play Music reminder.
   bool togglePlayback() {
     if (isBusy) return true;
+    if (_service.songsError.value != null) return _service.playSong(song);
     if (isPlaying) {
       _service.pauseSong(song);
       return true;

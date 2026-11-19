@@ -2,58 +2,139 @@
 
 **Application:** Christmas Countdown  
 **Android package:** com.santa.christmascountdown  
-**Last updated:** November 18, 2026
+**Last updated:** November 19, 2026
 
 ## 1. About this policy
 
-This policy explains how Christmas Countdown handles information. For privacy questions, contact the developer at thaivku@gmail.com.
+Welcome to Christmas Countdown!
+
+We respect your privacy and are committed to protecting your information while you enjoy our application.
+
+This Privacy Policy explains how Christmas Countdown collects, uses, stores and protects information when you use the app.
+
+For any questions regarding your privacy, please contact us at thaivku@gmail.com.
 
 ## 2. Information you provide
 
-The app does not require account registration or ask for your name, phone number, contacts or precise location. If you email the listed contact, the receiving email service receives your address and message. The developer must confirm how that correspondence is used, accessed, retained and deleted before publication. Do not include sensitive information that is not needed for support.
+Christmas Countdown does not require account registration or login.
+
+The app does not ask you to provide your name, phone number, home address, personal contacts, precise location or payment information.
+
+When you voluntarily contact us by email, your email address and message may be received and used to respond to your questions, resolve issues and provide application support.
+
+Please do not include sensitive personal information that is unnecessary for your support request.
 
 ## 3. Information stored on your device
 
-The app saves your selected countdown wallpaper, snowfall and sound-effect settings, and claimed Advent days for each year using local preferences. Advent stars are calculated from claimed days and calendar content. The current code does not persist the music switch, selected song or Bubble Box board between sessions.
+To provide a more personalized and convenient experience, the app stores certain preferences and progress locally on your device, including:
 
-Preferences are not uploaded to an app user profile by the current application code. Device backup settings may independently back up local app data. Downloaded content may also be cached by the platform or service SDKs.
+- Selected Christmas countdown wallpaper.
+- Snowfall effect settings.
+- Sound-effect settings.
+- Advent Calendar progress.
+- Claimed Advent rewards for each year.
+
+Advent stars are calculated based on claimed rewards and calendar content.
+
+These preferences and progress are stored locally and are not uploaded to an online user profile.
+
+Your device's operating system may independently back up application data according to your device settings. Downloaded content may also be temporarily cached by the operating system or service providers.
 
 ## 4. Network requests and service providers
 
-The app requests song metadata and Advent content from Firebase Cloud Firestore. Music and artwork can be loaded from the URLs supplied with song content, including Supabase Storage. These requests disclose your IP address and request details to the relevant hosting provider. Providers may process technical data and service logs for delivery, security and service operation under their terms and settings.
+Some features of Christmas Countdown require an Internet connection to deliver content, including Christmas music, artwork and Advent Calendar content.
 
-The application code does not integrate Firebase Analytics, advertising SDKs or an app account system. This does not mean network providers receive no technical information.
+The app uses Firebase Cloud Firestore and Supabase Storage to support the delivery of online content.
 
-Provider information:
+When accessing these services, technical information such as your IP address, request details and service logs may be processed by the relevant service providers for content delivery, security and service operation.
 
-- Google Privacy Policy: https://policies.google.com/privacy
-- Firebase privacy and security: https://firebase.google.com/support/privacy
-- Supabase Privacy Policy: https://supabase.com/privacy
+Christmas Countdown does not integrate Firebase Analytics, advertising SDKs or an account registration system.
+
+For more information about the privacy practices of our service providers, please refer to:
+
+- Google Privacy Policy: [https://policies.google.com/privacy](https://policies.google.com/privacy)
+- Firebase privacy and security: [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy)
+- Supabase Privacy Policy: [https://supabase.com/privacy](https://supabase.com/privacy)
 
 ## 5. Sharing images
 
-When you choose Share, the app generates an image of the displayed app page and opens the system sharing interface. The sharing plugin may create a temporary file to pass the image to your selected app. The recipient app or service handles the shared image under its own privacy policy. Christmas Countdown does not upload this screenshot to Firebase or Supabase as part of this sharing flow.
+Christmas Countdown allows you to share festive moments with your friends and family.
+
+When you use the Share feature, the app generates an image of the displayed application page and opens your device's system sharing interface.
+
+The generated image may be temporarily stored on your device to complete the sharing process.
+
+Christmas Countdown does not upload these images to Firebase or Supabase as part of the sharing process.
+
+Sharing is initiated by you. Any third-party application or service that receives the image handles it according to its own privacy policy.
 
 ## 6. Purposes and disclosure
 
-Information is used to display content, play media, retain local settings and progress, operate the supporting services and, subject to developer confirmation, respond to support requests. The application code does not sell personal information or send it to advertising services. Hosting providers process network information when delivering remote content; recipients receive images only when you choose to share them.
+Information is processed for the following purposes:
+
+- Providing and maintaining application features.
+- Displaying Christmas content and artwork.
+- Playing music and multimedia content.
+- Saving personal preferences.
+- Maintaining Advent Calendar progress.
+- Supporting service operation and security.
+- Responding to user questions and support requests.
+
+Christmas Countdown does not sell personal information or share personal information with advertising services.
+
+Third-party hosting providers may process technical information necessary to deliver online content.
+
+Images are shared with other applications or services only when you choose to use the Share feature.
 
 ## 7. Retention, deletion and choices
 
-Local preferences remain until overwritten or removed. You can clear app storage in Android settings or uninstall the app; operating-system backups may retain or restore data according to your device settings. There is no app account to delete. Data cached by SDKs or sharing tools is subject to their cache and platform behavior.
+Local application preferences and progress remain on your device until they are updated or removed.
 
-Provider logging settings, log retention periods and support-email retention practices have not been confirmed by the developer. Contact the developer about support correspondence or privacy requests. No fixed deletion period for provider logs is promised by this policy. The developer must confirm the contact-request process before publication; this policy does not promise a verified response or deletion schedule.
+You can remove locally stored application data by:
+
+- Clearing application storage in your device settings.
+- Uninstalling the application.
+
+Removing application data may result in the loss of your saved preferences and Advent Calendar progress.
+
+Some information may be retained or restored through operating-system backups, depending on your device settings.
+
+Christmas Countdown does not require user accounts. Therefore, there is no application account to delete.
+
+The retention of technical information, service logs and cached content depends on the applicable policies and settings of the relevant service providers.
+
+If you wish to request access to or deletion of information you have provided through support emails, please contact us using the email address listed in this policy.
 
 ## 8. Children
 
-The current app does not ask users for an age, account or personal profile. A parent or guardian may contact the developer about a child's privacy. Do not send children's personal information through support unless needed to address a request.
+Christmas Countdown is designed to provide an enjoyable Christmas-themed experience.
+
+The app does not require users to provide their age, register an account or create a personal profile.
+
+We respect children's privacy and encourage parents and guardians to supervise children's use of applications and online services.
+
+Parents or guardians who have questions or concerns regarding a child's privacy may contact us directly.
+
+Please avoid sharing children's personal information unless it is necessary to address a support request.
 
 ## 9. Security and international processing
 
-No storage or transmission method is completely secure. Information sent to service providers may be processed outside your country under their applicable policies and infrastructure settings. The app does not promise a specific processing location or absolute security.
+We value the security of information and aim to provide a safe application experience.
+
+However, no method of electronic storage or transmission over the Internet can guarantee absolute security.
+
+Information processed by third-party service providers may be stored or processed outside your country, depending on their infrastructure, settings and applicable privacy policies.
 
 ## 10. Updates and contact
 
-This policy may change with the app's features or data practices. The date above identifies the latest revision of this document.
+This Privacy Policy may be updated from time to time to reflect changes in application features, services or information-handling practices.
+
+The date displayed at the beginning of this document indicates the most recent revision.
+
+If you have any questions, feedback or requests regarding this Privacy Policy or your privacy, please contact us.
 
 Email: thaivku@gmail.com
+
+Thank you for using Christmas Countdown.
+
+Wishing you and your loved ones a joyful, peaceful and magical Christmas!

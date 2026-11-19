@@ -50,6 +50,32 @@ class _Firestore extends Fake implements FirebaseFirestore {
 }
 
 void main() {
+  test(
+    'Canonical audio source follows updated URL for an unchanged ID',
+    () async {
+      final fields = <String, dynamic>{
+        'title': 'Song',
+        'imageUrl': 'https://example.com/cover.png',
+        'audioUrl': 'https://example.com/old.mp3',
+      };
+      final repository = FirestoreSongRepository(
+        firestore: _Firestore(_Collection([_Document('same_id', fields)])),
+      );
+      final first = (await repository.fetchSongs()).single;
+      fields['audioUrl'] = ' https://example.com/new.mp3 ';
+      final second = (await repository.fetchSongs()).single;
+      expect(first.id, second.id);
+      expect(first.audioPath, 'https://example.com/old.mp3');
+      expect(second.audioPath, 'https://example.com/new.mp3');
+      // Preserve the existing path-first contract when both fields are populated.
+      fields['audioPath'] = ' assets/audio/jingle_bells.mp3 ';
+      expect(
+        (await repository.fetchSongs()).single.audioPath,
+        'assets/audio/jingle_bells.mp3',
+      );
+    },
+  );
+
   const valid = <String, dynamic>{
     'title': 'Valid song',
     'imagePath': 'assets/images/song.png',

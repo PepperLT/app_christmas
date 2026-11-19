@@ -14,5 +14,9 @@ abstract interface class MusicPlayer {
   Future<void> pause();
   Future<void> stop();
   Future<void> seek(Duration position);
+
+  /// Retire the underlying player so unfinished operations cannot affect the
+  /// replacement. Public streams must remain usable by existing listeners.
+  Future<void> reset();
   Future<void> dispose();
 }

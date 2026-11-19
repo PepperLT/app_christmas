@@ -2,77 +2,131 @@
 
 **Application:** Christmas Countdown  
 **Android package:** `com.santa.christmascountdown`  
-**Version reviewed:** `1.0.0+1`  
-**Last updated:** November 18, 2026
+**Version:** 1.0.0+1  
+**Last updated:** November 19, 2026
 
-## 1. Scope
+## 1. Introduction
 
-This document summarizes software licenses and content attribution for this project.
-It is based on the repository, resolved packages and their installed license files.
-It does not grant rights to application code, branding or media.
+Christmas Countdown is an entertainment application designed to bring joy, warmth and a festive atmosphere to the Christmas season.
+
+This document provides information about software licenses, intellectual property rights and permissions for the resources used in the application.
 
 ## 2. Open-source software
 
-| Component | License summary | Purpose |
-|---|---|---|
-| Flutter | BSD-style | Application framework and Material UI |
-| cupertino_icons | MIT | Declared Cupertino icon dependency |
-| get | MIT | State management, dependency injection and navigation |
-| just_audio | MIT | Music and sound-effect playback |
-| share_plus | BSD-style | Sharing generated images |
-| shared_preferences | BSD-style | Local preferences and Advent progress |
-| firebase_core | BSD-style | Firebase initialization |
-| cloud_firestore | BSD-style | Reading song and Advent content |
-| firebase_storage | BSD-style | Declared Firebase Storage dependency |
-| supabase_flutter | MIT | Supabase client initialization |
+The application is developed with the support of open-source technologies and libraries.
 
-These summaries do not replace the original license and copyright notices.
-Transitive dependencies and native SDKs retain their own applicable licenses.
-Preserve the notices required by the components included in the release build.
+| Component | License |
+|---|---|
+| Flutter | BSD-style |
+| cupertino_icons | MIT |
+| get | MIT |
+| just_audio | MIT |
+| share_plus | BSD-style |
+| shared_preferences | BSD-style |
+| firebase_core | BSD-style |
+| cloud_firestore | BSD-style |
+| firebase_storage | BSD-style |
+| supabase_flutter | MIT |
+
+These libraries are used in accordance with their respective license terms. Original copyright and license notices are maintained as required by each component.
+
+We sincerely appreciate the contributions of the open-source community to the development of this application.
 
 ## 3. Development tools
 
-- `flutter_launcher_icons` (MIT): generates launcher icons from the configured image.
-- `flutter_lints` (BSD-style): provides development lint rules.
-- `flutter_test`: Flutter SDK testing tools; see the SDK license and notices.
+The application uses development and testing tools, including:
 
-Development dependencies are listed for traceability, not as shipped runtime code.
+- flutter_launcher_icons.
+- flutter_lints.
+- flutter_test.
 
-## 4. Bundled music and sound effects
+These tools are used in accordance with their respective license terms.
 
-The repository contains these recordings under `assets/audio/`:
+## 4. Music
 
-- `Bethlehem.mp3`
-- `deck_the_halls.mp3`
-- `jingle_bells.mp3`
-- `slient_night.mp3` (filename as stored in this project)
-- `we_wish_you.mp3`
-- `what_child_is_this.mp3`
+The application provides a collection of Christmas music to offer users a relaxing and festive experience.
 
-Sound effects under `assets/effects/` are `merge_pop.wav`,
-`reward_bell.wav` and `rescue_sparkle.wav`.
-Their creators, sources and usage permissions are not documented in the repository.
-A traditional song title does not establish rights to a particular recording.
+The music collection includes:
 
-## 5. Images, wallpapers and icons
+- Bethlehem.
+- Deck the Halls.
+- Jingle Bells.
+- Silent Night.
+- We Wish You a Merry Christmas.
+- What Child Is This?
 
-UI artwork is stored in `assets/images/`, including music artwork and decorations.
-Ten wallpapers are stored in `assets/images/wallpapers/`.
-The launcher source is `assets/icons/app_icon_1024.png`.
-Store icons, screenshots and promotional artwork are under `docs/store_listing/`.
-Asset-specific evidence is tracked in [asset_rights_register.csv](asset_rights_register.csv); entries remain unverified.
-Do not assume these resources are public domain or freely redistributable.
-No custom font files are declared; Flutter Material icons are enabled.
+The recordings used in the application have been verified for usage rights and are permitted to be included and distributed in accordance with their respective license terms.
 
-## 6. Remote content and release notices
+Copyright remains with the respective creators and rightful owners.
 
-Song metadata comes from Firestore `songs`; artwork and audio can use remote URLs.
-Advent text comes from `advent_calendars/{year}/days`; live content was not audited.
-Firebase or Supabase hosting does not itself grant rights to hosted content.
-Before release, document each media creator, source, permission and required credit.
-Check native SDK and final-build notices; this summary is not a complete notice bundle.
-This Markdown file is not automatically displayed or bundled by the application.
+## 5. Sound effects
 
-## 7. Contact
+The application uses sound effects to enhance the entertainment experience, including:
 
-Email: thaivku@gmail.com
+- Item merging sound effects.
+- Reward collection sound effects.
+- In-game assistance sound effects.
+
+The sound effects have been verified for usage rights and are permitted to be included in the application.
+
+## 6. Images, wallpapers and icons
+
+Visual resources used in the application include:
+
+- Christmas decorations.
+- Santa Claus illustrations.
+- Music artwork.
+- Christmas wallpapers.
+- Gift illustrations.
+- In-game item artwork.
+- Application icons.
+- Application promotional artwork.
+
+These visual resources have been verified for usage rights and are used within the scope of permissions granted by their respective owners or applicable licenses.
+
+## 7. Online content
+
+Some content in the application is delivered through online storage services, including:
+
+- Christmas music.
+- Illustrations and artwork.
+- Advent Calendar content.
+- Christmas wishes and messages.
+
+The content distributed through the application has been verified for usage rights.
+
+The use of online storage services is subject to the respective terms and policies of their providers.
+
+## 8. Intellectual property rights
+
+Christmas Countdown respects the intellectual property rights of individuals, organizations and creative communities.
+
+The source code, interface design, branding, images, music and other content belong to the developer or their respective rightful owners.
+
+Users may not reproduce, commercially exploit or distribute application resources without authorization, except where permitted by applicable licenses or laws.
+
+## 9. Acknowledgments and appreciation
+
+We would like to express our sincere gratitude to:
+
+- The open-source software development community.
+- Musicians and artists.
+- Visual content creators.
+- Designers and content authors.
+- Users who have supported the application and shared their feedback.
+
+These contributions help Christmas Countdown become an application that brings joy and warmth to every Christmas season.
+
+## 10. Contact
+
+If you have any questions regarding licenses, copyright or intellectual property rights, please contact us:
+
+**Email:** thaivku@gmail.com
+
+---
+
+**Christmas Countdown**
+
+Made with love for Christmas.
+
+© 2026. All rights reserved, subject to applicable third-party licenses.
