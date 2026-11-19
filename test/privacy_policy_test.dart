@@ -17,9 +17,16 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(PrivacyPolicyPage), findsOneWidget);
     expect(find.text('1. About this policy'), findsOneWidget);
+    final storage = find.text('3. Information stored on your device');
+    await tester.ensureVisible(storage);
+    await tester.tap(storage);
+    await tester.pumpAndSettle();
     expect(
-      find.textContaining('does not persist the music switch'),
-      findsOneWidget,
+      find.textContaining(
+        'does not persist the music switch',
+        findRichText: true,
+      ),
+      findsWidgets,
     );
     final contact = find.text('Email: thaivku@gmail.com');
     await tester.ensureVisible(contact);

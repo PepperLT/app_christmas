@@ -4,15 +4,13 @@
 **Android package:** com.santa.christmascountdown  
 **Last updated:** November 18, 2026
 
-**Publication status:** Draft. Developer confirmation of support-email handling, provider logging/retention and processing locations is pending. This document has not yet been published at a confirmed public URL.
-
 ## 1. About this policy
 
 This policy explains how Christmas Countdown handles information. For privacy questions, contact the developer at thaivku@gmail.com.
 
 ## 2. Information you provide
 
-The app does not require account registration or ask for your name, phone number, contacts or precise location. If you email the listed contact, the receiving email service receives your address and message. The developer must confirm how that correspondence is used, accessed, retained and deleted before this draft is published. Do not include sensitive information that is not needed for support.
+The app does not require account registration or ask for your name, phone number, contacts or precise location. If you email the listed contact, the receiving email service receives your address and message. The developer must confirm how that correspondence is used, accessed, retained and deleted before publication. Do not include sensitive information that is not needed for support.
 
 ## 3. Information stored on your device
 
@@ -44,7 +42,7 @@ Information is used to display content, play media, retain local settings and pr
 
 Local preferences remain until overwritten or removed. You can clear app storage in Android settings or uninstall the app; operating-system backups may retain or restore data according to your device settings. There is no app account to delete. Data cached by SDKs or sharing tools is subject to their cache and platform behavior.
 
-Provider logging settings, log retention periods and support-email retention practices have not been confirmed by the developer. Contact the developer about support correspondence or privacy requests. No fixed deletion period for provider logs is promised by this policy. The developer must confirm the contact-request process before publication; this draft does not promise a verified response or deletion schedule.
+Provider logging settings, log retention periods and support-email retention practices have not been confirmed by the developer. Contact the developer about support correspondence or privacy requests. No fixed deletion period for provider logs is promised by this policy. The developer must confirm the contact-request process before publication; this policy does not promise a verified response or deletion schedule.
 
 ## 8. Children
 

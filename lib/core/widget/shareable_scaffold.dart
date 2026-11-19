@@ -15,6 +15,7 @@ class ShareableScaffold extends StatefulWidget {
     this.drawerScrimColor,
     this.bottomNavigationBar,
     this.shareService,
+    this.shareErrorMessage = 'Không thể chia sẻ ảnh. Vui lòng thử lại.',
   });
 
   final ChristmasDrawer drawer;
@@ -24,6 +25,7 @@ class ShareableScaffold extends StatefulWidget {
   final Color? drawerScrimColor;
   final Widget? bottomNavigationBar;
   final ScreenshotShareService? shareService;
+  final String shareErrorMessage;
 
   @override
   State<ShareableScaffold> createState() => _ShareableScaffoldState();
@@ -64,11 +66,9 @@ class _ShareableScaffoldState extends State<ShareableScaffold> {
       );
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Không thể chia sẻ ảnh. Vui lòng thử lại.'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(widget.shareErrorMessage)));
       }
     } finally {
       _sharing = false;

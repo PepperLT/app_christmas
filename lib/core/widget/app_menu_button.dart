@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AppMenuButton extends StatelessWidget {
-  const AppMenuButton({super.key, required this.onPressed});
+  const AppMenuButton({
+    super.key,
+    required this.onPressed,
+    this.tooltip = 'Mở menu',
+  });
 
   final VoidCallback onPressed;
+  final String tooltip;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressed,
-      tooltip: 'Mở menu',
+      tooltip: tooltip,
       icon: const Icon(Icons.menu_rounded),
       style: IconButton.styleFrom(
         backgroundColor: Colors.white,
