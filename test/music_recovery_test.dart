@@ -56,9 +56,9 @@ class _LatePlayer extends FakePlayer {
 }
 
 void main() {
-  test(
+  testWidgets(
     'A timed-out seek cannot move or restart the replacement player when it finishes late',
-    () async {
+    (tester) async {
       final old = FakePlayer();
       final replacement = FakePlayer();
       final song = _song('a.mp3');
@@ -71,17 +71,21 @@ void main() {
       addTearDown(service.onClose);
       service.toggleSong(song);
       service.setPlayMusic(true);
-      await flush();
+      await tester.pump();
+      expect(service.loadedSongId.value, song.id);
       old.pendingSeek = Completer<void>();
       service.seekSong(song, const Duration(seconds: 90));
-      await Future<void>.delayed(const Duration(milliseconds: 60));
+      await tester.pump();
+      expect(service.isSeeking.value, isTrue);
+      // Advance the fake clock to the timeout, independent of machine load.
+      await tester.pump(_deadline);
       expect(service.isBusy.value, isFalse);
       expect(service.isSeeking.value, isFalse);
       expect(old.disposed, isTrue);
       await service.retry();
-      await flush();
+      await tester.pump();
       old.pendingSeek!.complete();
-      await flush();
+      await tester.pump();
       expect(replacement.position, Duration.zero);
       expect(replacement.starts, 1);
       expect(service.error.value, isNull);
